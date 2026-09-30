@@ -3,7 +3,7 @@ import { imageHosts } from './image-hosts.config.mjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/riaddarsoufa',
+  basePath: process.env.GITHUB_ACTIONS ? '/riaddarsoufa' : '',
   trailingSlash: true,
   productionBrowserSourceMaps: true,
   distDir: process.env.DIST_DIR || '.next',
