@@ -2,7 +2,7 @@
 import React from 'react';
 import { useSite } from '@/context/SiteContext';
 
-const WHATSAPP_NUMBER = '212600000000';
+const WHATSAPP_NUMBER = '212767893121';
 
 export default function WhatsAppFloat() {
   const { dir } = useSite();
