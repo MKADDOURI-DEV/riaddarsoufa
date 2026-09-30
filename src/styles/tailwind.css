@@ -3,42 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --background: #FAF8F3;
-  --foreground: #1A1A14;
-  --primary: #2D5016;
-  --primary-foreground: #FAF8F3;
-  --secondary: #F0EDE6;
-  --secondary-foreground: #1A1A14;
-  --accent: #C8965A;
-  --accent-foreground: #1A1A14;
-  --muted: #F0EDE6;
-  --muted-foreground: #7A7060;
+  --background: #F7FAFC;
+  --foreground: #0B2A3F;
+  --primary: #0B4A6F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E8F1F6;
+  --secondary-foreground: #0B2A3F;
+  --accent: #1FA39A;
+  --accent-foreground: #FFFFFF;
+  --muted: #E8F1F6;
+  --muted-foreground: #5B7386;
   --card: #FFFFFF;
-  --card-foreground: #1A1A14;
-  --border: #E5E0D8;
-  --input: #E5E0D8;
-  --ring: #2D5016;
+  --card-foreground: #0B2A3F;
+  --border: #D9E5EC;
+  --input: #D9E5EC;
+  --ring: #1FA39A;
   --radius: 0.75rem;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-serif: 'DM Serif Display', serif;
 }
 
 .dark {
-  --background: #141410;
-  --foreground: #F0EDE6;
-  --primary: #3D6B1F;
-  --primary-foreground: #FAF8F3;
-  --secondary: #1E1E18;
-  --secondary-foreground: #F0EDE6;
-  --accent: #C8965A;
-  --accent-foreground: #1A1A14;
-  --muted: #1E1E18;
-  --muted-foreground: #9A9080;
-  --card: #1A1A14;
-  --card-foreground: #F0EDE6;
-  --border: #2A2A20;
-  --input: #2A2A20;
-  --ring: #3D6B1F;
+  --background: #071C2B;
+  --foreground: #E8F1F6;
+  --primary: #1FA39A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0C2B40;
+  --secondary-foreground: #E8F1F6;
+  --accent: #2CC4B8;
+  --accent-foreground: #071C2B;
+  --muted: #0C2B40;
+  --muted-foreground: #8FA9BA;
+  --card: #0A2436;
+  --card-foreground: #E8F1F6;
+  --border: #16405A;
+  --input: #16405A;
+  --ring: #2CC4B8;
 }
 
 @layer base {
@@ -224,7 +224,7 @@
   }
 
   .booking-bar-shadow {
-    box-shadow: 0 20px 60px -10px rgba(45, 80, 22, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 60px -10px rgba(11, 74, 111, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
   }
 
   .dark .booking-bar-shadow {
@@ -237,7 +237,7 @@
 
   .room-card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 50px -10px rgba(45, 80, 22, 0.2);
+    box-shadow: 0 20px 50px -10px rgba(11, 74, 111, 0.2);
   }
 
   .dark .room-card-hover:hover {
@@ -263,7 +263,7 @@
     background-color: var(--accent);
     color: var(--foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(200, 150, 90, 0.35);
+    box-shadow: 0 10px 30px rgba(31, 163, 154, 0.35);
   }
 
   .btn-secondary {
@@ -290,7 +290,7 @@
 
   .btn-accent {
     background-color: var(--accent);
-    color: #1A1A14;
+    color: #FFFFFF;
     border-radius: 9999px;
     padding: 0.875rem 2rem;
     font-weight: 600;
@@ -307,7 +307,7 @@
     background-color: var(--primary);
     color: var(--primary-foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.3);
+    box-shadow: 0 10px 30px rgba(11, 74, 111, 0.3);
   }
 
   /* Scrollbar */
@@ -359,7 +359,7 @@
 
   .form-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+    box-shadow: 0 0 0 3px rgba(11, 74, 111, 0.1);
   }
 
   .dark .form-input {
