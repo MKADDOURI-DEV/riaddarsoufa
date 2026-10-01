@@ -310,6 +310,14 @@ function AccountsEditor() {
     await supabase.auth.signOut();
   });
 
+  const removeMine = () => run(async () => {
+    if (!mine) return;
+    if (!confirm('Supprimer votre propre compte ? Vous serez déconnecté et ne pourrez plus vous connecter avec cet email.')) return;
+    await callAdmins({ action: 'delete', id: mine.id });
+    alert('Votre compte a été supprimé.');
+    await supabase.auth.signOut();
+  });
+
   const create = () => run(async () => {
     await callAdmins({ action: 'create', email: newEmail, password: newPassword });
     setNewEmail(''); setNewPassword(''); setMsg('✅ Compte créé. Il peut se connecter immédiatement.'); await load();
@@ -350,10 +358,18 @@ function AccountsEditor() {
                 placeholder="•••••••• (inchangé)" value={myPassword} onChange={(e) => setMyPassword(e.target.value)} />
               <button type="button" onClick={() => setShowPwd((v) => !v)} className="rounded-lg border border-foreground/20 px-3 text-sm">{showPwd ? 'Cacher' : 'Voir'}</button>
             </div>
-            <p className="text-xs text-foreground/50 mt-1">Le mot de passe actuel est chiffré et ne peut pas être affiché. Saisissez-en un nouveau (8 caractères minimum) pour le changer.</p>
+            <p className="text-xs text-foreground/50 mt-1">« Voir » affiche ce que vous tapez. Le mot de passe actuel est chiffré et ne peut jamais être affiché : pour le changer, saisissez-en un nouveau (8 caractères minimum).</p>
           </div>
         </div>
-        <button type="button" disabled={busy || !mine} onClick={saveMine} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={busy || !mine} onClick={saveMine} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
+          {accounts.length > 1 && (
+            <button type="button" disabled={busy} onClick={removeMine} className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600">Supprimer mon compte</button>
+          )}
+        </div>
+        {accounts.length <= 1 && (
+          <p className="text-xs text-foreground/50 mt-3">C’est le seul compte admin : il ne peut pas être supprimé (au moins un compte doit rester).</p>
+        )}
         {mine && <p className="text-xs text-foreground/50 mt-3">Dernière connexion : {mine.last_sign_in_at ? new Date(mine.last_sign_in_at).toLocaleString('fr-FR') : 'jamais'}</p>}
       </section>
 
