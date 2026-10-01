@@ -2,19 +2,15 @@
 
 import React from 'react';
 import { useSite } from '@/context/SiteContext';
-
-// Numéro WhatsApp de Heaven Beach
-// 0767893121 → 212767893121
-const WHATSAPP_NUMBER = '212767893121';
+import { waDigits } from '@/lib/content';
 
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  "Bonjour Heaven Beach, je souhaite avoir plus d'informations."
+  "Bonjour Riad Dar Soufa, je souhaite avoir plus d'informations."
 );
 
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
-
 export default function WhatsAppFloat() {
-  const { dir } = useSite();
+  const { dir, contact } = useSite();
+  const WHATSAPP_URL = `https://wa.me/${waDigits(contact.whatsapp)}?text=${WHATSAPP_MESSAGE}`;
 
   return (
     <a
@@ -22,7 +18,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"
-      aria-label="Contacter Heaven Beach sur WhatsApp"
+      aria-label="Contacter Riad Dar Soufa sur WhatsApp"
       style={
         dir === 'rtl'
           ? { right: 'auto', left: '2rem' }

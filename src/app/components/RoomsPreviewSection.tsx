@@ -3,10 +3,9 @@ import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
-import { ROOMS } from '@/lib/data';
 
 export default function RoomsPreviewSection() {
-  const { t, lang, dir } = useSite();
+  const { t, lang, dir, rooms: ROOMS } = useSite();
   // BENTO GRID AUDIT:
   // Array has 4 cards: [Chambre Andalouse, Suite Royale, Chambre Jardin, Suite Familiale]
   // Row 1: [col-1: Chambre Andalouse cs-1] [col-2: Suite Royale cs-2]

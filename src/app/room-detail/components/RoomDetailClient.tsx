@@ -8,10 +8,10 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
-import { ROOMS } from '@/lib/data';
+import { waDigits } from '@/lib/content';
 
 function RoomDetailContent() {
-  const { t, lang, dir } = useSite();
+  const { t, lang, dir, rooms: ROOMS, contact } = useSite();
   const searchParams = useSearchParams();
   const slug = searchParams?.get('slug') || ROOMS?.[0]?.slug;
   const room = ROOMS?.find(r => r?.slug === slug) || ROOMS?.[0];
@@ -135,7 +135,7 @@ function RoomDetailContent() {
 
                 {/* WhatsApp */}
                 <a
-                  href={`https://wa.me/212600000000?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par la ${room?.name?.fr}`)}`}
+                  href={`https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par la ${room?.name?.fr}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary w-full text-sm"

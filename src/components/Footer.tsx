@@ -3,9 +3,10 @@ import React from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
+import { formatPhone, telHref, waDigits } from '@/lib/content';
 
 export default function Footer() {
-  const { t, dir } = useSite();
+  const { t, lang, dir, contact } = useSite();
 
   return (
     <footer dir={dir} className="bg-foreground text-background pt-16 pb-8 px-4 sm:px-6 lg:px-8">
@@ -23,7 +24,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://instagram.com/riaddarsofa"
+                href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
@@ -32,7 +33,7 @@ export default function Footer() {
                 IG
               </a>
               <a
-                href="https://facebook.com/riaddarsofa"
+                href={contact.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
@@ -41,7 +42,7 @@ export default function Footer() {
                 FB
               </a>
               <a
-                href="https://wa.me/212600000000"
+                href={`https://wa.me/${waDigits(contact.whatsapp)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
@@ -81,24 +82,24 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-background/60">
                 <span className="text-accent mt-0.5">📍</span>
-                <span>Médina de Rabat, Maroc</span>
+                <span>{contact.address[lang]}</span>
               </li>
               <li>
-                <a href="tel:+212537000000" className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={telHref(contact.phone)} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
                   <span className="text-accent">📞</span>
-                  +212 537 000 000
+                  {formatPhone(contact.phone)}
                 </a>
               </li>
               <li>
-                <a href="mailto:contact@riaddarsofa.ma" className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
                   <span className="text-accent">✉️</span>
-                  contact@riaddarsofa.ma
+                  {contact.email}
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/212600000000" className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={`https://wa.me/${waDigits(contact.whatsapp)}`} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
                   <span className="text-accent">💬</span>
-                  +212 600 000 000
+                  {formatPhone(contact.whatsapp)}
                 </a>
               </li>
             </ul>

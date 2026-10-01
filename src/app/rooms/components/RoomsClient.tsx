@@ -5,12 +5,11 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import RoomCard from '@/components/RoomCard';
-import { ROOMS } from '@/lib/data';
 import { useSite } from '@/context/SiteContext';
 import AppImage from '@/components/ui/AppImage';
 
 function RoomsContent() {
-  const { t, dir } = useSite();
+  const { t, dir, rooms: ROOMS } = useSite();
   const [filter, setFilter] = useState<'all' | '2' | '4'>('all');
 
   const filtered = ROOMS.filter((r) => {

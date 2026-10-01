@@ -6,11 +6,11 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
-import { SERVICES } from '@/lib/data';
+import { formatPhone, telHref } from '@/lib/content';
 import Icon from '@/components/ui/AppIcon';
 
 function ServicesContent() {
-  const { t, lang, dir } = useSite();
+  const { t, lang, dir, services: SERVICES, contact } = useSite();
 
   const iconMap: Record<string, string> = {
     SunIcon: 'SunIcon',
@@ -203,8 +203,8 @@ function ServicesContent() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <a href="tel:+212537000000" className="btn-accent text-sm px-6 py-3">
-                    📞 +212 537 000 000
+                  <a href={telHref(contact.phone)} className="btn-accent text-sm px-6 py-3">
+                    📞 {formatPhone(contact.phone)}
                   </a>
                 </div>
               </div>

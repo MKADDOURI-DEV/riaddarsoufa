@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Language, TRANSLATIONS } from '@/lib/data';
+import { Language, TRANSLATIONS, Room, Service, ContactInfo } from '@/lib/data';
+import { DEFAULT_CONTENT, loadContentRows, mergeContent } from '@/lib/content';
 
 interface SiteContextType {
   lang: Language;
@@ -9,6 +10,9 @@ interface SiteContextType {
   isDark: boolean;
   toggleDark: () => void;
   dir: 'ltr' | 'rtl';
+  rooms: Room[];
+  services: Service[];
+  contact: ContactInfo;
 }
 
 const SiteContext = createContext<SiteContextType | null>(null);
@@ -16,6 +20,16 @@ const SiteContext = createContext<SiteContextType | null>(null);
 export function SiteProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Language>('fr');
   const [isDark, setIsDark] = useState(false);
+  const [content, setContent] = useState(DEFAULT_CONTENT);
+
+  // Contenu géré depuis l'admin (chambres, services, contact)
+  useEffect(() => {
+    let cancelled = false;
+    loadContentRows().then((rows) => {
+      if (!cancelled && rows) setContent(mergeContent(rows));
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('rds-lang') as Language | null;
@@ -51,7 +65,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir }}>
+    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: content.rooms, services: content.services, contact: content.contact }}>
       {children}
     </SiteContext.Provider>
   );

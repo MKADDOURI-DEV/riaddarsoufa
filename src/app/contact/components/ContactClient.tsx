@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import { formatPhone, telHref, waDigits } from '@/lib/content';
 
 interface FormData {
   nom: string;
@@ -24,7 +25,7 @@ interface FormErrors {
 }
 
 function ContactContent() {
-  const { t, dir } = useSite();
+  const { t, lang, dir, contact } = useSite();
   const [formData, setFormData] = useState<FormData>({
     nom: '', prenom: '', email: '', telephone: '', sujet: '', message: ''
   });
@@ -68,26 +69,26 @@ function ContactContent() {
   {
     icon: '📍',
     label: t.contact.address,
-    value: 'Médina de Rabat, Maroc',
-    href: 'https://maps.google.com/?q=Medina+Rabat+Morocco'
+    value: contact.address[lang],
+    href: contact.googleMapsUrl
   },
   {
     icon: '📞',
     label: t.contact.phone,
-    value: '+212 537 000 000',
-    href: 'tel:+212537000000'
+    value: formatPhone(contact.phone),
+    href: telHref(contact.phone)
   },
   {
     icon: '💬',
     label: t.contact.whatsapp,
-    value: '+212 600 000 000',
-    href: 'https://wa.me/212600000000'
+    value: formatPhone(contact.whatsapp),
+    href: `https://wa.me/${waDigits(contact.whatsapp)}`
   },
   {
     icon: '✉️',
     label: t.contact.email,
-    value: 'contact@riaddarsofa.ma',
-    href: 'mailto:contact@riaddarsofa.ma'
+    value: contact.email,
+    href: `mailto:${contact.email}`
   }];
 
 
@@ -161,7 +162,7 @@ function ContactContent() {
                   </div>
                 </div>
                 <a
-                  href="https://maps.google.com/?q=Medina+Rabat+Morocco"
+                  href={contact.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary w-full text-sm">

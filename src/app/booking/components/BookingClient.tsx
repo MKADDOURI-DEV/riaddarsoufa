@@ -8,7 +8,8 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
-import { ROOMS, Room } from '@/lib/data';
+import { waDigits } from '@/lib/content';
+import { Room } from '@/lib/data';
 
 type BookingStep = 'search' | 'results' | 'form' | 'confirmation';
 
@@ -21,7 +22,7 @@ interface BookingFormData {
 }
 
 function BookingContent() {
-  const { t, lang, dir } = useSite();
+  const { t, lang, dir, rooms: ROOMS, contact } = useSite();
   const searchParams = useSearchParams();
 
   const [step, setStep] = useState<BookingStep>('search');
@@ -535,7 +536,7 @@ function BookingContent() {
                     {dir === 'rtl' ? 'الرئيسية' : 'Retour à l\'accueil'}
                   </Link>
                   <a
-                    href={`https://wa.me/212600000000?text=${encodeURIComponent(`Bonjour, j'ai une réservation confirmée ${confirmationRef}`)}`}
+                    href={`https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(`Bonjour, j'ai une réservation confirmée ${confirmationRef}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-accent flex-1"
