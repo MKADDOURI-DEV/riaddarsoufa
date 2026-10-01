@@ -43,15 +43,16 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
     }
     if (row.key === 'services' && Array.isArray(row.value)) {
       const stored = row.value as StoredService[];
-      const base = DEFAULT_CONTENT.services.map((def) => {
-        const s = stored.find((x) => x.id === def.id);
-        return s ? { ...def, name: s.name, description: s.description, available: s.available } : def;
+      result.services = stored.map((x) => {
+        const def = DEFAULT_CONTENT.services.find((d) => d.id === x.id);
+        return {
+          id: x.id,
+          icon: x.icon || def?.icon || 'SparklesIcon',
+          name: x.name,
+          description: x.description,
+          available: x.available,
+        } as Service;
       });
-      // Services ajoutés par le propriétaire (affichés après les services de base)
-      const extras: Service[] = stored
-        .filter((x) => !BASE_SERVICE_IDS.has(x.id))
-        .map((x) => ({ id: x.id, icon: x.icon || 'SparklesIcon', name: x.name, description: x.description, available: x.available }));
-      result.services = [...base, ...extras];
     }
     if (row.key === 'contact' && row.value && typeof row.value === 'object') {
       const c = row.value as Partial<ContactInfo>;

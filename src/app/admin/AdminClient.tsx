@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
-import { BASE_SERVICE_IDS, DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
+import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
 type Tab = 'rooms' | 'services' | 'contact' | 'accounts';
 
@@ -223,31 +223,30 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
   return (
     <div>
       <p className="text-sm text-foreground/60 mb-4">
-        Modifiez les textes de chaque service. Vous pouvez aussi ajouter vos propres services : ils apparaissent sous les services habituels.
+        Modifiez, ajoutez ou supprimez vos services. N’oubliez pas d’enregistrer.
       </p>
       {items.map((s, i) => {
-        const isBase = BASE_SERVICE_IDS.has(s.id);
         return (
-          <details key={s.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0 || !isBase}>
+          <details key={s.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0}>
             <summary className="cursor-pointer font-semibold text-foreground">
-              {s.name.fr}{!isBase ? ' (ajouté)' : ''}{!s.available && !isBase ? ' — masqué' : ''}
+              {s.name.fr}{!s.available ? ' — masqué' : ''}
             </summary>
             <div className="mt-4">
               <TriField label="Nom" value={s.name} onChange={(v) => update(i, { name: v })} />
               <TriField label="Description" multiline value={s.description} onChange={(v) => update(i, { description: v })} />
-              {!isBase && (
+              {(
                 <div className="mb-4">
                   <label className={labelCls}>Icône</label>
-                  <select className={inputCls} value={s.icon || 'SparklesIcon'} onChange={(e) => update(i, { icon: e.target.value })}>
+                  <select className={inputCls} value={s.icon === 'HomeIcon' ? 'HomeModernIcon' : (s.icon || 'SparklesIcon')} onChange={(e) => update(i, { icon: e.target.value })}>
                     {ICON_CHOICES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
               )}
               <label className="flex items-center gap-2 text-sm text-foreground mb-3">
                 <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
-                {isBase ? 'Service disponible' : 'Afficher ce service sur le site'}
+                Afficher ce service sur le site
               </label>
-              {!isBase && (
+              {(
                 <button type="button" onClick={() => remove(i)} className="rounded border border-red-300 px-3 py-1 text-xs text-red-600">Supprimer ce service</button>
               )}
             </div>
