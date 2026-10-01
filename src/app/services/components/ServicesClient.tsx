@@ -211,6 +211,21 @@ function ServicesContent() {
             </div>
 
           </div>
+
+          {/* Services ajoutés par le propriétaire */}
+          {SERVICES.slice(8).filter((s) => s.available).length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              {SERVICES.slice(8).filter((s) => s.available).map((s) =>
+              <div key={s.id} className="bg-card border border-border rounded-2xl p-8 hover:-translate-y-1 transition-transform duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                    <Icon name={s.icon} size={24} className="text-primary" />
+                  </div>
+                  <h2 className="font-serif text-xl text-foreground mb-3">{s.name[lang]}</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.description[lang]}</p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
       </main>
       <Footer />

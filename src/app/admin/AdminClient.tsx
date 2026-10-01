@@ -4,9 +4,35 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
-import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
+import { BASE_SERVICE_IDS, DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
-type Tab = 'rooms' | 'services' | 'contact';
+type Tab = 'rooms' | 'services' | 'contact' | 'accounts';
+
+const ICON_CHOICES: { value: string; label: string }[] = [
+  { value: 'SparklesIcon', label: '✨ Étoiles' }, { value: 'StarIcon', label: '⭐ Étoile' },
+  { value: 'HeartIcon', label: '❤️ Cœur' }, { value: 'GiftIcon', label: '🎁 Cadeau' },
+  { value: 'SunIcon', label: '☀️ Soleil' }, { value: 'WifiIcon', label: '📶 Wi-Fi' },
+  { value: 'TruckIcon', label: '🚐 Transport' }, { value: 'CakeIcon', label: '🍰 Repas / gâteau' },
+  { value: 'MapIcon', label: '🗺️ Visites' }, { value: 'PhoneIcon', label: '📞 Téléphone' },
+  { value: 'HomeModernIcon', label: '🏠 Maison' }, { value: 'MusicalNoteIcon', label: '🎵 Musique' },
+  { value: 'BuildingStorefrontIcon', label: '🏪 Boutique' }, { value: 'KeyIcon', label: '🔑 Clé' },
+  { value: 'ClockIcon', label: '🕒 Horaires' }, { value: 'UserGroupIcon', label: '👥 Groupe' },
+  { value: 'FireIcon', label: '🔥 Feu' }, { value: 'ShieldCheckIcon', label: '🛡️ Sécurité' },
+];
+
+async function callAdmins(body: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke('manage-admins', { body });
+  if (error) {
+    let msg = error.message;
+    try {
+      const j = await (error as unknown as { context: Response }).context.json();
+      if (j?.error) msg = j.error;
+    } catch { /* ignore */ }
+    throw new Error(msg);
+  }
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
 type Tri = { fr: string; en: string; ar: string };
 
 const inputCls =
@@ -176,6 +202,16 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
   const [msg, setMsg] = useState('');
   const update = (i: number, patch: Partial<StoredService>) =>
     setItems((xs) => xs.map((x, idx) => (idx === i ? { ...x, ...patch } : x)));
+  const add = () =>
+    setItems((xs) => [...xs, {
+      id: `svc-${Date.now()}`, icon: 'SparklesIcon', available: true,
+      name: { fr: 'Nouveau service', en: 'New service', ar: 'خدمة جديدة' },
+      description: { fr: '', en: '', ar: '' },
+    }]);
+  const remove = (i: number) => {
+    if (!confirm('Supprimer ce service ?')) return;
+    setItems((xs) => xs.filter((_, idx) => idx !== i));
+  };
 
   const save = async () => {
     setSaving(true); setMsg('');
@@ -186,24 +222,137 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
 
   return (
     <div>
-      <p className="text-sm text-foreground/60 mb-4">Vous pouvez modifier les textes et la disponibilité de chaque service.</p>
-      {items.map((s, i) => (
-        <details key={s.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0}>
-          <summary className="cursor-pointer font-semibold text-foreground">{s.name.fr}</summary>
-          <div className="mt-4">
-            <TriField label="Nom" value={s.name} onChange={(v) => update(i, { name: v })} />
-            <TriField label="Description" multiline value={s.description} onChange={(v) => update(i, { description: v })} />
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
-              Service disponible
-            </label>
-          </div>
-        </details>
-      ))}
+      <p className="text-sm text-foreground/60 mb-4">
+        Modifiez les textes de chaque service. Vous pouvez aussi ajouter vos propres services : ils apparaissent sous les services habituels.
+      </p>
+      {items.map((s, i) => {
+        const isBase = BASE_SERVICE_IDS.has(s.id);
+        return (
+          <details key={s.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0 || !isBase}>
+            <summary className="cursor-pointer font-semibold text-foreground">
+              {s.name.fr}{!isBase ? ' (ajouté)' : ''}{!s.available && !isBase ? ' — masqué' : ''}
+            </summary>
+            <div className="mt-4">
+              <TriField label="Nom" value={s.name} onChange={(v) => update(i, { name: v })} />
+              <TriField label="Description" multiline value={s.description} onChange={(v) => update(i, { description: v })} />
+              {!isBase && (
+                <div className="mb-4">
+                  <label className={labelCls}>Icône</label>
+                  <select className={inputCls} value={s.icon || 'SparklesIcon'} onChange={(e) => update(i, { icon: e.target.value })}>
+                    {ICON_CHOICES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+              )}
+              <label className="flex items-center gap-2 text-sm text-foreground mb-3">
+                <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
+                {isBase ? 'Service disponible' : 'Afficher ce service sur le site'}
+              </label>
+              {!isBase && (
+                <button type="button" onClick={() => remove(i)} className="rounded border border-red-300 px-3 py-1 text-xs text-red-600">Supprimer ce service</button>
+              )}
+            </div>
+          </details>
+        );
+      })}
       <div className="flex flex-wrap items-center gap-3 mt-6">
+        <button type="button" onClick={add} className="rounded-lg border border-foreground/20 px-4 py-2 text-sm">+ Ajouter un service</button>
         <button type="button" onClick={save} disabled={saving} className="btn-primary disabled:opacity-60">{saving ? 'Enregistrement…' : 'Enregistrer les services'}</button>
         {msg && <span className="text-sm" role="status">{msg}</span>}
       </div>
+    </div>
+  );
+}
+
+/* ---------------------------- Accounts editor ---------------------------- */
+interface AdminAccount { id: string; email: string; last_sign_in_at: string | null }
+
+function AccountsEditor() {
+  const [accounts, setAccounts] = useState<AdminAccount[] | null>(null);
+  const [me, setMe] = useState('');
+  const [msg, setMsg] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [edits, setEdits] = useState<Record<string, { email: string; password: string }>>({});
+
+  const load = useCallback(async () => {
+    try {
+      const d = await callAdmins({ action: 'list' });
+      setAccounts(d.admins); setMe(d.me);
+    } catch (e) { setMsg('❌ ' + (e as Error).message); setAccounts([]); }
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true); setMsg('');
+    try { await fn(); } catch (e) { setMsg('❌ ' + (e as Error).message); }
+    setBusy(false);
+  };
+
+  const create = () => run(async () => {
+    await callAdmins({ action: 'create', email: newEmail, password: newPassword });
+    setNewEmail(''); setNewPassword(''); setMsg('✅ Compte créé. Il peut se connecter immédiatement.'); await load();
+  });
+
+  const update = (a: AdminAccount) => run(async () => {
+    const e = edits[a.id] || { email: '', password: '' };
+    const d = await callAdmins({ action: 'update', id: a.id, email: e.email.trim(), password: e.password });
+    setEdits((x) => ({ ...x, [a.id]: { email: '', password: '' } }));
+    if (d?.relogin) {
+      alert('Votre compte a été modifié. Reconnectez-vous avec vos nouveaux identifiants.');
+      await supabase.auth.signOut();
+      return;
+    }
+    setMsg('✅ Compte modifié.'); await load();
+  });
+
+  const remove = (a: AdminAccount) => run(async () => {
+    if (!confirm(`Supprimer le compte ${a.email} ?`)) return;
+    await callAdmins({ action: 'delete', id: a.id });
+    setMsg('✅ Compte supprimé.'); await load();
+  });
+
+  return (
+    <div>
+      <p className="text-sm text-foreground/60 mb-4">
+        Chaque compte ci-dessous peut se connecter à cette page d’administration. Laissez un champ vide pour ne pas le modifier. Mot de passe : 8 caractères minimum.
+      </p>
+      {!accounts ? <p className="text-sm">Chargement…</p> : accounts.map((a) => {
+        const e = edits[a.id] || { email: '', password: '' };
+        const set = (patch: Partial<{ email: string; password: string }>) => setEdits((x) => ({ ...x, [a.id]: { ...e, ...patch } }));
+        return (
+          <div key={a.id} className="mb-4 rounded-xl border border-foreground/15 p-4">
+            <p className="font-semibold text-foreground">{a.email}{a.id === me ? ' (vous)' : ''}</p>
+            <p className="text-xs text-foreground/50 mb-3">
+              Dernière connexion : {a.last_sign_in_at ? new Date(a.last_sign_in_at).toLocaleString('fr-FR') : 'jamais'}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <div><label className={labelCls}>Nouvel email</label>
+                <input type="email" autoComplete="off" className={inputCls} value={e.email} onChange={(ev) => set({ email: ev.target.value })} /></div>
+              <div><label className={labelCls}>Nouveau mot de passe</label>
+                <input type="password" autoComplete="new-password" className={inputCls} value={e.password} onChange={(ev) => set({ password: ev.target.value })} /></div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" disabled={busy || (!e.email && !e.password)} onClick={() => update(a)} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
+              {a.id !== me && (
+                <button type="button" disabled={busy} onClick={() => remove(a)} className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600">Supprimer ce compte</button>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="mt-8 rounded-xl border border-dashed border-foreground/25 p-4">
+        <h3 className="font-semibold text-foreground mb-3">Ajouter un compte admin</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div><label className={labelCls}>Email</label>
+            <input type="email" autoComplete="off" className={inputCls} value={newEmail} onChange={(ev) => setNewEmail(ev.target.value)} /></div>
+          <div><label className={labelCls}>Mot de passe</label>
+            <input type="password" autoComplete="new-password" className={inputCls} value={newPassword} onChange={(ev) => setNewPassword(ev.target.value)} /></div>
+        </div>
+        <button type="button" disabled={busy || !newEmail || !newPassword} onClick={create} className="btn-primary text-sm disabled:opacity-50">Créer le compte</button>
+      </div>
+      {msg && <p className="mt-4 text-sm" role="status">{msg}</p>}
     </div>
   );
 }
@@ -269,6 +418,7 @@ function Dashboard({ session }: { session: Session }) {
     { id: 'rooms', label: 'Chambres & prix' },
     { id: 'services', label: 'Services' },
     { id: 'contact', label: 'Contact' },
+    { id: 'accounts', label: 'Comptes admin' },
   ];
 
   return (
@@ -300,9 +450,10 @@ function Dashboard({ session }: { session: Session }) {
             {tab === 'rooms' && <RoomsEditor key="r" initial={content.rooms} onSave={(v) => saveKey('rooms', v)} />}
             {tab === 'services' && (
               <ServicesEditor key="s"
-                initial={content.services.map(({ id, name, description, available }) => ({ id, name, description, available }))}
+                initial={content.services.map(({ id, name, description, available, icon }) => ({ id, name, description, available, icon }))}
                 onSave={(v) => saveKey('services', v)} />
             )}
+            {tab === 'accounts' && <AccountsEditor key="a" />}
             {tab === 'contact' && <ContactEditor key="c" initial={content.contact} onSave={(v) => saveKey('contact', v)} />}
           </>
         )}

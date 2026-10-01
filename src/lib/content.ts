@@ -11,7 +11,10 @@ export const DEFAULT_CONTACT: ContactInfo = {
   facebook: SITE_CONFIG.facebook,
 };
 
-export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'>;
+export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string };
+
+/** Services de base (mise en page fixe) : ils ne peuvent pas être supprimés, seulement modifiés. */
+export const BASE_SERVICE_IDS = new Set(SERVICES.map((s) => s.id));
 
 export interface SiteContent {
   rooms: Room[];
@@ -40,10 +43,15 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
     }
     if (row.key === 'services' && Array.isArray(row.value)) {
       const stored = row.value as StoredService[];
-      result.services = DEFAULT_CONTENT.services.map((def) => {
+      const base = DEFAULT_CONTENT.services.map((def) => {
         const s = stored.find((x) => x.id === def.id);
         return s ? { ...def, name: s.name, description: s.description, available: s.available } : def;
       });
+      // Services ajoutés par le propriétaire (affichés après les services de base)
+      const extras: Service[] = stored
+        .filter((x) => !BASE_SERVICE_IDS.has(x.id))
+        .map((x) => ({ id: x.id, icon: x.icon || 'SparklesIcon', name: x.name, description: x.description, available: x.available }));
+      result.services = [...base, ...extras];
     }
     if (row.key === 'contact' && row.value && typeof row.value === 'object') {
       const c = row.value as Partial<ContactInfo>;
