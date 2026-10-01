@@ -435,7 +435,7 @@ function Dashboard({ session }: { session: Session }) {
         </div>
       </header>
       <main className="max-w-4xl mx-auto px-4 py-6">
-        <div className="flex gap-2 mb-6 overflow-x-auto" role="tablist">
+        <div className="flex flex-wrap gap-2 mb-6" role="tablist">
           {tabs.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
               className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold border ${tab === t.id ? 'bg-primary text-primary-foreground border-primary' : 'border-foreground/20'}`}>
