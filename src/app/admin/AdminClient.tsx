@@ -270,6 +270,9 @@ function AccountsEditor() {
   const [me, setMe] = useState('');
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
+  const [myEmail, setMyEmail] = useState('');
+  const [myPassword, setMyPassword] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [edits, setEdits] = useState<Record<string, { email: string; password: string }>>({});
@@ -278,6 +281,8 @@ function AccountsEditor() {
     try {
       const d = await callAdmins({ action: 'list' });
       setAccounts(d.admins); setMe(d.me);
+      const mine = (d.admins as AdminAccount[]).find((a) => a.id === d.me);
+      if (mine) setMyEmail(mine.email);
     } catch (e) { setMsg('❌ ' + (e as Error).message); setAccounts([]); }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -288,6 +293,23 @@ function AccountsEditor() {
     setBusy(false);
   };
 
+  const mine = accounts?.find((a) => a.id === me);
+  const others = (accounts || []).filter((a) => a.id !== me);
+
+  // Mon compte : l'email actuel est pré-rempli ; on modifie puis on enregistre
+  const saveMine = () => run(async () => {
+    if (!mine) return;
+    const emailChanged = myEmail.trim().toLowerCase() !== mine.email.toLowerCase();
+    if (!emailChanged && !myPassword) { setMsg('Rien à modifier.'); return; }
+    await callAdmins({
+      action: 'update', id: mine.id,
+      email: emailChanged ? myEmail.trim() : '',
+      password: myPassword,
+    });
+    alert('✅ Vos identifiants ont été modifiés. Vous allez être déconnecté : reconnectez-vous avec votre nouvel email et mot de passe.');
+    await supabase.auth.signOut();
+  });
+
   const create = () => run(async () => {
     await callAdmins({ action: 'create', email: newEmail, password: newPassword });
     setNewEmail(''); setNewPassword(''); setMsg('✅ Compte créé. Il peut se connecter immédiatement.'); await load();
@@ -295,13 +317,8 @@ function AccountsEditor() {
 
   const update = (a: AdminAccount) => run(async () => {
     const e = edits[a.id] || { email: '', password: '' };
-    const d = await callAdmins({ action: 'update', id: a.id, email: e.email.trim(), password: e.password });
+    await callAdmins({ action: 'update', id: a.id, email: e.email.trim(), password: e.password });
     setEdits((x) => ({ ...x, [a.id]: { email: '', password: '' } }));
-    if (d?.relogin) {
-      alert('Votre compte a été modifié. Reconnectez-vous avec vos nouveaux identifiants.');
-      await supabase.auth.signOut();
-      return;
-    }
     setMsg('✅ Compte modifié.'); await load();
   });
 
@@ -311,46 +328,76 @@ function AccountsEditor() {
     setMsg('✅ Compte supprimé.'); await load();
   });
 
+  if (!accounts) return <p className="text-sm">Chargement…</p>;
+
   return (
     <div>
-      <p className="text-sm text-foreground/60 mb-4">
-        Chaque compte ci-dessous peut se connecter à cette page d’administration. Laissez un champ vide pour ne pas le modifier. Mot de passe : 8 caractères minimum.
-      </p>
-      {!accounts ? <p className="text-sm">Chargement…</p> : accounts.map((a) => {
-        const e = edits[a.id] || { email: '', password: '' };
-        const set = (patch: Partial<{ email: string; password: string }>) => setEdits((x) => ({ ...x, [a.id]: { ...e, ...patch } }));
-        return (
-          <div key={a.id} className="mb-4 rounded-xl border border-foreground/15 p-4">
-            <p className="font-semibold text-foreground">{a.email}{a.id === me ? ' (vous)' : ''}</p>
-            <p className="text-xs text-foreground/50 mb-3">
-              Dernière connexion : {a.last_sign_in_at ? new Date(a.last_sign_in_at).toLocaleString('fr-FR') : 'jamais'}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-              <div><label className={labelCls}>Nouvel email</label>
-                <input type="email" autoComplete="off" className={inputCls} value={e.email} onChange={(ev) => set({ email: ev.target.value })} /></div>
-              <div><label className={labelCls}>Nouveau mot de passe</label>
-                <input type="password" autoComplete="new-password" className={inputCls} value={e.password} onChange={(ev) => set({ password: ev.target.value })} /></div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" disabled={busy || (!e.email && !e.password)} onClick={() => update(a)} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
-              {a.id !== me && (
-                <button type="button" disabled={busy} onClick={() => remove(a)} className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600">Supprimer ce compte</button>
-              )}
-            </div>
-          </div>
-        );
-      })}
-
-      <div className="mt-8 rounded-xl border border-dashed border-foreground/25 p-4">
-        <h3 className="font-semibold text-foreground mb-3">Ajouter un compte admin</h3>
+      {/* ---- Mon compte ---- */}
+      <section className="rounded-xl border border-foreground/15 p-4 mb-8">
+        <h3 className="font-semibold text-foreground mb-1">Mon compte (email et mot de passe de connexion)</h3>
+        <p className="text-xs text-foreground/60 mb-4">
+          Modifiez l’email et/ou le mot de passe, puis cliquez sur « Enregistrer ». Vous serez déconnecté et devrez vous reconnecter avec les nouveaux identifiants.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-          <div><label className={labelCls}>Email</label>
-            <input type="email" autoComplete="off" className={inputCls} value={newEmail} onChange={(ev) => setNewEmail(ev.target.value)} /></div>
-          <div><label className={labelCls}>Mot de passe</label>
-            <input type="password" autoComplete="new-password" className={inputCls} value={newPassword} onChange={(ev) => setNewPassword(ev.target.value)} /></div>
+          <div>
+            <label className={labelCls}>Email de connexion</label>
+            <input type="email" autoComplete="off" className={inputCls} value={myEmail} onChange={(e) => setMyEmail(e.target.value)} />
+          </div>
+          <div>
+            <label className={labelCls}>Mot de passe</label>
+            <div className="flex gap-2">
+              <input type={showPwd ? 'text' : 'password'} autoComplete="new-password" className={inputCls}
+                placeholder="•••••••• (inchangé)" value={myPassword} onChange={(e) => setMyPassword(e.target.value)} />
+              <button type="button" onClick={() => setShowPwd((v) => !v)} className="rounded-lg border border-foreground/20 px-3 text-sm">{showPwd ? 'Cacher' : 'Voir'}</button>
+            </div>
+            <p className="text-xs text-foreground/50 mt-1">Le mot de passe actuel est chiffré et ne peut pas être affiché. Saisissez-en un nouveau (8 caractères minimum) pour le changer.</p>
+          </div>
         </div>
-        <button type="button" disabled={busy || !newEmail || !newPassword} onClick={create} className="btn-primary text-sm disabled:opacity-50">Créer le compte</button>
-      </div>
+        <button type="button" disabled={busy || !mine} onClick={saveMine} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
+        {mine && <p className="text-xs text-foreground/50 mt-3">Dernière connexion : {mine.last_sign_in_at ? new Date(mine.last_sign_in_at).toLocaleString('fr-FR') : 'jamais'}</p>}
+      </section>
+
+      {/* ---- Autres comptes ---- */}
+      <details className="rounded-xl border border-foreground/15 p-4">
+        <summary className="cursor-pointer font-semibold text-foreground">
+          Autres comptes admin ({others.length}) — ajouter ou gérer d’autres utilisateurs
+        </summary>
+        <div className="mt-4">
+          {others.map((a) => {
+            const e = edits[a.id] || { email: '', password: '' };
+            const set = (patch: Partial<{ email: string; password: string }>) => setEdits((x) => ({ ...x, [a.id]: { ...e, ...patch } }));
+            return (
+              <div key={a.id} className="mb-4 rounded-xl border border-foreground/15 p-4">
+                <p className="font-semibold text-foreground">{a.email}</p>
+                <p className="text-xs text-foreground/50 mb-3">
+                  Dernière connexion : {a.last_sign_in_at ? new Date(a.last_sign_in_at).toLocaleString('fr-FR') : 'jamais'}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                  <div><label className={labelCls}>Nouvel email</label>
+                    <input type="email" autoComplete="off" className={inputCls} value={e.email} onChange={(ev) => set({ email: ev.target.value })} /></div>
+                  <div><label className={labelCls}>Nouveau mot de passe</label>
+                    <input type="password" autoComplete="new-password" className={inputCls} value={e.password} onChange={(ev) => set({ password: ev.target.value })} /></div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" disabled={busy || (!e.email && !e.password)} onClick={() => update(a)} className="btn-primary text-sm disabled:opacity-50">Enregistrer</button>
+                  <button type="button" disabled={busy} onClick={() => remove(a)} className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600">Supprimer ce compte</button>
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="rounded-xl border border-dashed border-foreground/25 p-4">
+            <h3 className="font-semibold text-foreground mb-3">Ajouter un compte admin</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <div><label className={labelCls}>Email</label>
+                <input type="email" autoComplete="off" className={inputCls} value={newEmail} onChange={(ev) => setNewEmail(ev.target.value)} /></div>
+              <div><label className={labelCls}>Mot de passe</label>
+                <input type="password" autoComplete="new-password" className={inputCls} value={newPassword} onChange={(ev) => setNewPassword(ev.target.value)} /></div>
+            </div>
+            <button type="button" disabled={busy || !newEmail || !newPassword} onClick={create} className="btn-primary text-sm disabled:opacity-50">Créer le compte</button>
+          </div>
+        </div>
+      </details>
       {msg && <p className="mt-4 text-sm" role="status">{msg}</p>}
     </div>
   );
@@ -417,7 +464,7 @@ function Dashboard({ session }: { session: Session }) {
     { id: 'rooms', label: 'Chambres & prix' },
     { id: 'services', label: 'Services' },
     { id: 'contact', label: 'Contact' },
-    { id: 'accounts', label: 'Comptes admin' },
+    { id: 'accounts', label: 'Mon compte' },
   ];
 
   return (
