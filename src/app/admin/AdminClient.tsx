@@ -4,9 +4,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
+import GuideAdmin from './GuideAdmin';
 import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
-type Tab = 'rooms' | 'services' | 'contact' | 'accounts';
+type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
 
 const ICON_CHOICES: { value: string; label: string }[] = [
   { value: 'SparklesIcon', label: '✨ Étoiles' }, { value: 'StarIcon', label: '⭐ Étoile' },
@@ -480,6 +481,7 @@ function Dashboard({ session }: { session: Session }) {
     { id: 'rooms', label: 'Chambres & prix' },
     { id: 'services', label: 'Services' },
     { id: 'contact', label: 'Contact' },
+    { id: 'guide', label: '📱 Guide d’accueil' },
     { id: 'accounts', label: 'Mon compte' },
   ];
 
@@ -515,6 +517,7 @@ function Dashboard({ session }: { session: Session }) {
                 initial={content.services.map(({ id, name, description, available, icon }) => ({ id, name, description, available, icon }))}
                 onSave={(v) => saveKey('services', v)} />
             )}
+            {tab === 'guide' && <GuideAdmin key="g" />}
             {tab === 'accounts' && <AccountsEditor key="a" />}
             {tab === 'contact' && <ContactEditor key="c" initial={content.contact} onSave={(v) => saveKey('contact', v)} />}
           </>
