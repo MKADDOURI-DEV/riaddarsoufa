@@ -42,10 +42,8 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <AppLogo size={36} />
-            <span className="font-serif text-xl tracking-tight text-foreground group-hover:text-accent transition-colors">
-              Riad Dar Soufa
-            </span>
+            <AppLogo size={56} />
+            <span className="sr-only">Riad Dar Soufa</span>
           </Link>
 
           {/* Desktop Nav */}

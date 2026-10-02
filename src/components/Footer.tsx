@@ -16,8 +16,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <AppLogo size={36} />
-              <span className="font-serif text-xl text-background">Riad Dar Soufa</span>
+              <AppLogo size={72} src="/assets/images/app_logo_light.png" />
+              <span className="sr-only">Riad Dar Soufa</span>
             </div>
             <p className="text-sm text-background/60 leading-relaxed max-w-xs">
               {t?.footer?.tagline}

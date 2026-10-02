@@ -55,11 +55,11 @@ export const SITE_CONFIG = {
   phone: '+212537000000',
   email: 'contact@riaddarsofa.ma',
   address: {
-    fr: 'Médina de Rabat, Maroc',
-    en: 'Medina of Rabat, Morocco',
-    ar: 'المدينة العتيقة، الرباط، المغرب',
+    fr: '7 impasse Souaf, Legza, Av. Mohamed V, Médina, 10000 Rabat, Maroc',
+    en: '7 Impasse Souaf, Legza, Av. Mohamed V, Medina, 10000 Rabat, Morocco',
+    ar: '7 زنقة سواف، الكزة، شارع محمد الخامس، المدينة العتيقة، 10000 الرباط، المغرب',
   },
-  googleMapsUrl: 'https://maps.google.com/?q=Medina+Rabat+Morocco',
+  googleMapsUrl: 'https://maps.google.com/?q=7+impasse+Souaf+Legza+Medina+10000+Rabat+Maroc',
   instagram: 'https://instagram.com/riaddarsofa',
   facebook: 'https://facebook.com/riaddarsofa',
 };
