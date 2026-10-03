@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { ImageField as UploadField } from './ImageUpload';
 import {
   DEFAULT_PRACTICAL, DEFAULT_WELCOME, DEFAULT_WHATSAPP, GuidePlace, GuideService, GuidePractical,
   GuideWelcome, GuideWhatsapp, mergeSettings, whatsappHref,
@@ -56,56 +57,6 @@ function SaveBar({ onSave, saving, msg, label = 'Enregistrer' }: { onSave: () =>
         {saving ? 'Enregistrement…' : label}
       </button>
       {msg && <span className="text-sm" role="status">{msg}</span>}
-    </div>
-  );
-}
-
-/** Réduit l'image (max 1400 px) avant l'envoi : plus rapide depuis un téléphone. */
-async function resizeImage(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1400 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  return await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Image illisible.'))), 'image/jpeg', 0.85));
-}
-
-function ImageField({ value, onChange }: { value: string; onChange: (url: string) => void }) {
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState('');
-
-  const upload = async (file: File | undefined) => {
-    if (!file) return;
-    setBusy(true); setErr('');
-    try {
-      const blob = await resizeImage(file);
-      const path = `${crypto.randomUUID()}.jpg`;
-      const { error } = await supabase.storage.from('guide-images').upload(path, blob, { contentType: 'image/jpeg' });
-      if (error) throw new Error(error.message);
-      const { data } = supabase.storage.from('guide-images').getPublicUrl(path);
-      onChange(data.publicUrl);
-    } catch (e) { setErr((e as Error).message); }
-    setBusy(false);
-  };
-
-  return (
-    <div className="mb-4">
-      <span className={labelCls}>Image</span>
-      {value && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={value} alt="" className="mb-2 h-32 w-full max-w-xs rounded-lg object-cover border border-foreground/15" />
-      )}
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="cursor-pointer rounded-lg border border-foreground/20 px-3 py-2 text-sm">
-          {busy ? 'Envoi…' : value ? 'Changer l’image' : 'Téléverser une image'}
-          <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
-        </label>
-        {value && <button type="button" onClick={() => onChange('')} className="rounded-lg border border-red-300 px-3 py-2 text-sm text-red-600">Retirer</button>}
-      </div>
-      <input className={`${inputCls} mt-2`} placeholder="ou collez un lien d’image (https://…)" value={value} onChange={(e) => onChange(e.target.value)} />
-      {err && <p className="text-xs text-red-600 mt-1">{err}</p>}
     </div>
   );
 }
@@ -275,7 +226,7 @@ function ServicesEditor() {
                 <BiField label="Précision sur le prix (ex : par personne)" fr={s.price_note_fr} en={s.price_note_en} onChange={(v) => update(i, { price_note_fr: v.fr, price_note_en: v.en })} />
               </div>
             </div>
-            <ImageField value={s.image_url} onChange={(url) => update(i, { image_url: url })} />
+            <UploadField bucket="guide-images" value={s.image_url} onChange={(url) => update(i, { image_url: url })} />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
               Service disponible (affiché sur /guide)
@@ -324,7 +275,7 @@ function PlacesEditor() {
             <Field label="Lien Google Maps" hint="Laissez vide : un lien de recherche Google Maps sera créé avec le nom du lieu.">
               <input className={inputCls} value={p.maps_url} onChange={(e) => update(i, { maps_url: e.target.value })} />
             </Field>
-            <ImageField value={p.image_url} onChange={(url) => update(i, { image_url: url })} />
+            <UploadField bucket="guide-images" value={p.image_url} onChange={(url) => update(i, { image_url: url })} />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={p.active} onChange={(e) => update(i, { active: e.target.checked })} />
               Lieu actif (affiché sur /guide)
@@ -407,7 +358,7 @@ function SettingsEditor() {
       <h3 className="font-semibold mb-3">Message de bienvenue</h3>
       <BiField label="Titre" fr={w.title_fr} en={w.title_en} onChange={(v) => set({ title_fr: v.fr, title_en: v.en })} />
       <BiField label="Texte d’accueil" multiline fr={w.subtitle_fr} en={w.subtitle_en} onChange={(v) => set({ subtitle_fr: v.fr, subtitle_en: v.en })} />
-      <ImageField value={w.image_url} onChange={(url) => set({ image_url: url })} />
+      <UploadField bucket="guide-images" label="Image de bienvenue" value={w.image_url} onChange={(url) => set({ image_url: url })} />
       <SaveBar onSave={save} saving={saving} msg={msg} />
     </div>
   );

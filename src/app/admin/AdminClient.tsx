@@ -5,6 +5,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
+import { MultiImageField } from './ImageUpload';
 import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
 type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
@@ -179,11 +180,7 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
               <input type="checkbox" checked={r.available} onChange={(e) => update(i, { available: e.target.checked })} />
               Chambre disponible à la réservation
             </label>
-            <div className="mb-2">
-              <label className={labelCls}>Photos (une URL par ligne, la première est la photo principale)</label>
-              <textarea rows={4} className={inputCls} value={r.images.join('\n')}
-                onChange={(e) => update(i, { images: e.target.value.split('\n').map((x) => x.trim()).filter(Boolean) })} />
-            </div>
+            <MultiImageField bucket="site-images" label="Photos de la chambre" value={r.images} onChange={(images) => update(i, { images })} />
           </div>
         </details>
       ))}
