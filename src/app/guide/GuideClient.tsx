@@ -18,6 +18,7 @@ const UI = {
     maps: 'Voir sur Google Maps', openMaps: 'Ouvrir dans Google Maps',
     whatsapp: 'Contacter le Riad sur WhatsApp', loading: 'Chargement…', error: 'Impossible de charger les dernières informations. Réessayez dans un instant.',
     currency: 'MAD', onRequest: 'Sur demande', footer: 'Riad Dar Soufa — Médina de Rabat',
+    askReception: 'Demandez les informations à la réception du riad.', parkingAsk: 'Pour le stationnement, merci de nous contacter avant votre arrivée.',
   },
   en: {
     hours: 'Opening hours', hoursNote: 'General riad hours',
@@ -28,6 +29,7 @@ const UI = {
     maps: 'View on Google Maps', openMaps: 'Open in Google Maps',
     whatsapp: 'Contact the Riad on WhatsApp', loading: 'Loading…', error: 'Could not load the latest information. Please try again shortly.',
     currency: 'MAD', onRequest: 'On request', footer: 'Riad Dar Soufa — Rabat Medina',
+    askReception: 'Please ask the riad reception for this information.', parkingAsk: 'For parking, please contact us before your arrival.',
   },
 } as const;
 
@@ -111,20 +113,19 @@ export default function GuideClient() {
   const accessText = pick(practical.access.description_fr, practical.access.description_en, lang);
   const parkingText = pick(practical.parking.description_fr, practical.parking.description_en, lang);
   const parkingInstr = pick(practical.parking.instructions_fr, practical.parking.instructions_en, lang);
-  const hasAccess = !!(accessText || practical.access.address || practical.access.maps_url || parkingText || parkingInstr);
 
   const nav = [
     { id: 'horaires', label: t.hours, show: true },
-    { id: 'wifi', label: t.wifi, show: hasWifi },
+    { id: 'wifi', label: t.wifi, show: true },
     { id: 'services', label: t.services, show: services.length > 0 },
     { id: 'rabat', label: t.rabat, show: places.length > 0 },
-    { id: 'acces', label: t.access, show: hasAccess },
+    { id: 'acces', label: t.access, show: true },
   ].filter((n) => n.show);
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-28" style={{ scrollBehavior: 'smooth' }}>
       {/* Barre du haut */}
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-border">
+      <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--background)_94%,transparent)] backdrop-blur border-b border-border">
         <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
           <AppLogo size={44} />
           <div className="flex rounded-full border border-border p-0.5 text-sm font-semibold" role="group" aria-label="Langue / Language">
@@ -143,7 +144,7 @@ export default function GuideClient() {
         <section className="relative mt-4 overflow-hidden rounded-3xl bg-foreground text-background">
           {heroImg && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={heroImg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" />
+            <img src={heroImg} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="absolute inset-0 h-full w-full object-cover opacity-60" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10" />
           <div className="relative flex min-h-[300px] flex-col justify-end p-6">
@@ -181,9 +182,9 @@ export default function GuideClient() {
         </section>
 
         {/* Wi-Fi */}
-        {hasWifi && (
-          <section className="mt-10">
-            <SectionTitle icon="📶" id="wifi">{t.wifi}</SectionTitle>
+        <section className="mt-10">
+          <SectionTitle icon="📶" id="wifi">{t.wifi}</SectionTitle>
+          {hasWifi ? (
             <div className="divide-y divide-border rounded-2xl border border-border bg-card">
               {practical.wifi_name && (
                 <div className="flex items-center justify-between gap-3 p-4">
@@ -204,8 +205,10 @@ export default function GuideClient() {
                 </div>
               )}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground">{t.askReception}</p>
+          )}
+        </section>
 
         {/* Services */}
         {services.length > 0 && (
@@ -218,13 +221,13 @@ export default function GuideClient() {
                   <article key={s.id} className="overflow-hidden rounded-2xl border border-border bg-card">
                     {s.image_url && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.image_url} alt="" loading="lazy" className="h-40 w-full object-cover" />
+                      <img src={s.image_url} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="h-40 w-full object-cover" />
                     )}
                     <div className="p-5">
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="font-serif text-xl text-foreground">{pick(s.name_fr, s.name_en, lang)}</h3>
                         {s.price !== null && s.price !== undefined && (
-                          <span className="shrink-0 rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
+                          <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-3 py-1 text-sm font-semibold text-accent">
                             {Number(s.price).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB')} {t.currency}
                           </span>
                         )}
@@ -253,10 +256,10 @@ export default function GuideClient() {
                   <article key={p.id} className="overflow-hidden rounded-2xl border border-border bg-card">
                     {p.image_url && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image_url} alt={name} loading="lazy" className="h-44 w-full object-cover" />
+                      <img src={p.image_url} alt={name} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="h-44 w-full object-cover" />
                     )}
                     <div className="p-5">
-                      {cat && <span className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">{cat}</span>}
+                      {cat && <span className="inline-block rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-3 py-1 text-xs font-semibold text-accent">{cat}</span>}
                       <h3 className="mt-2 font-serif text-xl text-foreground">{name}</h3>
                       {pick(p.description_fr, p.description_en, lang) && (
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{pick(p.description_fr, p.description_en, lang)}</p>
@@ -274,35 +277,35 @@ export default function GuideClient() {
         )}
 
         {/* Accès & Parking */}
-        {hasAccess && (
-          <section className="mt-10">
-            <SectionTitle icon="🚗" id="acces">{t.access}</SectionTitle>
-            <div className="space-y-3">
-              {(accessText || practical.access.address || practical.access.maps_url) && (
-                <div className="rounded-2xl border border-border bg-card p-5">
-                  <h3 className="font-serif text-xl text-foreground">{t.accessTitle}</h3>
-                  {accessText && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{accessText}</p>}
-                  {practical.access.address && <p className="mt-2 text-sm text-foreground">{practical.access.address}</p>}
-                  <div className="mt-4">
-                    <MapsButton href={mapsLink(practical.access.maps_url, practical.access.address || 'Riad Dar Soufa Rabat')} label={t.openMaps} />
-                  </div>
-                </div>
-              )}
-              {(parkingText || parkingInstr) && (
-                <div className="rounded-2xl border border-border bg-card p-5">
-                  <h3 className="font-serif text-xl text-foreground">🅿️ {t.parking}</h3>
+        <section className="mt-10">
+          <SectionTitle icon="🚗" id="acces">{t.access}</SectionTitle>
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <h3 className="font-serif text-xl text-foreground">{t.accessTitle}</h3>
+              {accessText && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{accessText}</p>}
+              {practical.access.address && <p className="mt-2 text-sm text-foreground">{practical.access.address}</p>}
+              <div className="mt-4">
+                <MapsButton href={mapsLink(practical.access.maps_url, practical.access.address || 'Riad Dar Soufa Rabat')} label={t.openMaps} />
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <h3 className="font-serif text-xl text-foreground">🅿️ {t.parking}</h3>
+              {parkingText || parkingInstr ? (
+                <>
                   {parkingText && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{parkingText}</p>}
                   {parkingInstr && (
-                    <div className="mt-3 rounded-xl bg-accent/10 p-4">
+                    <div className="mt-3 rounded-xl bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] p-4">
                       <p className="text-xs font-semibold uppercase tracking-wide text-accent">{t.instructions}</p>
                       <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-foreground">{parkingInstr}</p>
                     </div>
                   )}
-                </div>
+                </>
+              ) : (
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.parkingAsk}</p>
               )}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {status === 'loading' && <p className="mt-10 text-center text-sm text-muted-foreground">{t.loading}</p>}
 
@@ -311,7 +314,7 @@ export default function GuideClient() {
 
       {/* WhatsApp */}
       {waOk && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--background)_96%,transparent)] backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <a href={waHref} target="_blank" rel="noopener noreferrer"
             className="mx-auto flex max-w-xl items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-base font-semibold text-white shadow-lg active:scale-[0.98] transition">
             <span aria-hidden="true">💬</span>{t.whatsapp}

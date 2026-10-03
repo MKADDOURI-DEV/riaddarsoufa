@@ -413,6 +413,37 @@ function SettingsEditor() {
   );
 }
 
+/* ------------------------------ À compléter ------------------------------ */
+function Checklist() {
+  const [todo, setTodo] = useState<string[] | null>(null);
+  useEffect(() => {
+    (async () => {
+      const [s, sv, pl] = await Promise.all([
+        supabase.from('guide_settings').select('key, value'),
+        supabase.from('guide_services').select('id, price, available'),
+        supabase.from('guide_places').select('id, image_url, active'),
+      ]);
+      const m = mergeSettings(s.data);
+      const t: string[] = [];
+      if (!m.whatsapp.number.replace(/\D/g, '')) t.push('Numéro WhatsApp (sans lui, le bouton WhatsApp est masqué sur /guide)');
+      if (!m.practical.wifi_name || !m.practical.wifi_password) t.push('Nom et mot de passe du Wi-Fi');
+      if (!m.practical.parking.description_fr && !m.practical.parking.instructions_fr) t.push('Infos parking');
+      if (!m.practical.access.description_fr) t.push('Description « comment venir »');
+      if (!m.welcome.image_url) t.push('Image de bienvenue (Paramètres)');
+      if ((sv.data || []).some((x: { price: number | null; available: boolean }) => x.available && x.price === null)) t.push('Prix des services (laissez vide si sans prix)');
+      if ((pl.data || []).some((x: { image_url: string; active: boolean }) => x.active && !x.image_url)) t.push('Photos des lieux de Rabat');
+      setTodo(t);
+    })();
+  }, []);
+  if (!todo || todo.length === 0) return null;
+  return (
+    <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+      <p className="font-semibold mb-1">À compléter pour un guide prêt à l’emploi :</p>
+      <ul className="list-disc pl-5 space-y-0.5">{todo.map((x) => <li key={x}>{x}</li>)}</ul>
+    </div>
+  );
+}
+
 /* ----------------------------------- Root ----------------------------------- */
 export default function GuideAdmin() {
   const [sub, setSub] = useState<Sub>('practical');
@@ -429,6 +460,7 @@ export default function GuideAdmin() {
       <p className="text-sm text-foreground/60 mb-4">
         Contenu de la page <a href="/guide" target="_blank" rel="noopener noreferrer" className="underline">/guide</a> (accessible par QR code). Les modifications sont visibles immédiatement après « Enregistrer ».
       </p>
+      <Checklist />
       <div className="flex flex-wrap gap-2 mb-6" role="tablist">
         {subs.map((s) => (
           <button key={s.id} role="tab" aria-selected={sub === s.id} onClick={() => setSub(s.id)}
