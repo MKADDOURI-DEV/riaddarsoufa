@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import SectionLabel from '@/components/SectionLabel';
 
 export default function RoomsPreviewSection() {
   const { t, lang, dir, rooms: ROOMS } = useSite();
@@ -18,8 +19,8 @@ export default function RoomsPreviewSection() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.4em] text-accent">{t?.rooms?.allRooms}</span>
-            <h2 className="font-serif text-display text-foreground mt-3">{t?.rooms?.title}</h2>
+            <SectionLabel number="02">{t?.rooms?.allRooms}</SectionLabel>
+            <h2 className="font-serif text-display text-foreground mt-4">{t?.rooms?.title}</h2>
             <p className="text-muted-foreground mt-2 max-w-md">{t?.rooms?.subtitle}</p>
           </div>
           <Link href="/rooms" className="btn-secondary flex-shrink-0">

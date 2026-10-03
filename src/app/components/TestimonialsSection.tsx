@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useSite } from '@/context/SiteContext';
+import SectionLabel from '@/components/SectionLabel';
 import { TESTIMONIALS } from '@/lib/data';
 
 export default function TestimonialsSection() {
@@ -14,8 +15,8 @@ export default function TestimonialsSection() {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-14">
-          <span className="text-xs font-bold uppercase tracking-[0.4em] text-accent/80">{t?.testimonials?.subtitle}</span>
+        <div className="mb-14">
+          <SectionLabel number="03" light>{t?.testimonials?.subtitle}</SectionLabel>
           <h2 className="font-serif text-display text-primary-foreground mt-3">{t?.testimonials?.title}</h2>
         </div>
 

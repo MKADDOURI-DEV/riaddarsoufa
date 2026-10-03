@@ -5,71 +5,56 @@ import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
 
 export default function HeroSection() {
-  const { t, dir } = useSite();
+  const { t, dir, rooms, lang } = useSite();
+  const L = lang === 'ar'
+    ? { overline: 'الرباط · المدينة العتيقة', rooms: 'غرف وأجنحة', place: 'مدينة الرباط العتيقة', direct: 'حجز مباشر', scroll: 'اكتشف' }
+    : lang === 'en'
+    ? { overline: 'Rabat · Medina', rooms: 'Rooms & suites', place: 'Rabat Medina', direct: 'Direct booking', scroll: 'Discover' }
+    : { overline: 'Rabat · Médina', rooms: 'Chambres & suites', place: 'Médina de Rabat', direct: 'Réservation directe', scroll: 'Découvrir' };
+
+  const stats = [
+    { value: String(rooms.length), label: L.rooms },
+    { value: 'Rabat', label: L.place },
+    { value: '100 %', label: L.direct },
+  ];
 
   return (
-    <section dir={dir} className="relative min-h-screen flex flex-col" aria-label="Hero">
-      {/* Background Image */}
+    <section dir={dir} className="relative flex min-h-screen flex-col" aria-label="Hero">
+      {/* Image plein écran */}
       <div className="absolute inset-0">
         <AppImage
           src="https://img.rocket.new/generatedImages/rocket_gen_img_11c05f051-1772250211690.png"
-          alt="Cour intérieure d'un riad marocain traditionnel avec fontaine et zellige, atmosphère sombre et luxueuse, lumières chaudes tamisées"
+          alt="Cour intérieure du Riad Dar Soufa avec fontaine et zellige"
           fill
           priority
           className="object-cover"
           sizes="100vw" />
-        
-        {/* Gradient scrim */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/60" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(15,36,31,0.72) 0%, rgba(15,36,31,0.35) 40%, rgba(15,36,31,0.82) 100%)' }} />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col flex-1 justify-center items-center text-center px-4 pt-32 pb-40">
-        {/* Ornament */}
-        <div className="moroccan-divider w-32 mb-8">
-          <span className="text-accent text-xs font-bold tracking-[0.5em] uppercase px-4 text-white/70">
-            Rabat, Maroc
-          </span>
-        </div>
-
-        <h1 className="font-serif text-hero text-white mb-6 animate-fade-up leading-none">
-          Riad Dar Soufa
-        </h1>
-
-        <p className="text-base sm:text-lg text-white/80 max-w-2xl mb-10 leading-relaxed animate-fade-up delay-200 font-light">
+      {/* Contenu */}
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pb-44 pt-36 sm:px-6 lg:px-8">
+        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 animate-fade-up">{L.overline}</p>
+        <h1 className="font-serif text-hero max-w-4xl text-white animate-fade-up leading-[0.95]">Riad Dar Soufa</h1>
+        <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-white/85 sm:text-lg animate-fade-up delay-200">
           {t?.hero?.subtitle}
         </p>
-
-        <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up delay-300">
-          <Link href="/booking" className="btn-accent text-base px-8 py-4">
-            {t?.hero?.cta1}
-          </Link>
-          <Link href="/rooms" className="btn-secondary text-base px-8 py-4 border-white/40 text-white hover:border-accent hover:text-accent">
-            {t?.hero?.cta2}
-          </Link>
-        </div>
-
-        {/* Stats Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-16 animate-fade-up delay-400">
-          {[
-          { value: '4', label: dir === 'rtl' ? 'غرف فاخرة' : 'Chambres d\'exception' },
-          { value: '5★', label: dir === 'rtl' ? 'تقييم الضيوف' : 'Note de nos hôtes' },
-          { value: '2026', label: dir === 'rtl' ? 'تأسيس' : 'Établi en' }]?.
-          map((stat, i) =>
-          <div key={i} className="text-center">
-              <div className="font-serif text-3xl text-accent italic">{stat?.value}</div>
-              <div className="text-xs text-white/60 uppercase tracking-widest mt-1">{stat?.label}</div>
-            </div>
-          )}
+        <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row animate-fade-up delay-300">
+          <Link href="/booking" className="btn-accent px-8 py-4 text-base">{t?.hero?.cta1}</Link>
+          <Link href="/rooms" className="btn-secondary !border-white/60 px-8 py-4 text-base !text-white hover:!border-white hover:!text-white">{t?.hero?.cta2}</Link>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-float">
-        <span className="text-white/40 text-xs uppercase tracking-widest">Scroll</span>
-        <div className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent" />
+      {/* Bandeau d'informations (faits vérifiables) */}
+      <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/20" style={{ background: 'rgba(15,36,31,0.55)', backdropFilter: 'blur(6px)' }}>
+        <div className="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-white/20 px-4 sm:px-6 lg:px-8">
+          {stats.map((s) => (
+            <div key={s.label} className="px-3 py-5 text-center sm:px-6">
+              <div className="font-serif text-2xl text-white sm:text-3xl">{s.value}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/70 sm:text-xs">{s.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>);
-
 }

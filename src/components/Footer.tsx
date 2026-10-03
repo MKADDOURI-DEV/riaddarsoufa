@@ -9,17 +9,17 @@ export default function Footer() {
   const { t, lang, dir, contact } = useSite();
 
   return (
-    <footer dir={dir} className="bg-foreground text-background pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+    <footer dir={dir} className="bg-primary text-primary-foreground pt-16 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Main Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-background/10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-primary-foreground/10">
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <AppLogo size={72} src="/assets/images/app_logo_light.png" />
               <span className="sr-only">Riad Dar Soufa</span>
             </div>
-            <p className="text-sm text-background/60 leading-relaxed max-w-xs">
+            <p className="text-sm text-primary-foreground/60 leading-relaxed max-w-xs">
               {t?.footer?.tagline}
             </p>
             <div className="flex items-center gap-3 pt-2">
@@ -27,7 +27,7 @@ export default function Footer() {
                 href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
+                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center text-primary-foreground/60 hover:text-accent hover:border-accent transition-all text-sm"
                 aria-label="Instagram"
               >
                 IG
@@ -36,7 +36,7 @@ export default function Footer() {
                 href={contact.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
+                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center text-primary-foreground/60 hover:text-accent hover:border-accent transition-all text-sm"
                 aria-label="Facebook"
               >
                 FB
@@ -45,7 +45,7 @@ export default function Footer() {
                 href={`https://wa.me/${waDigits(contact.whatsapp)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/60 hover:text-accent hover:border-accent transition-all text-sm"
+                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center text-primary-foreground/60 hover:text-accent hover:border-accent transition-all text-sm"
                 aria-label="WhatsApp"
               >
                 WA
@@ -67,7 +67,7 @@ export default function Footer() {
                 <li key={link?.href}>
                   <Link
                     href={link?.href}
-                    className="text-sm text-background/60 hover:text-accent transition-colors duration-200"
+                    className="text-sm text-primary-foreground/60 hover:text-accent transition-colors duration-200"
                   >
                     {link?.label}
                   </Link>
@@ -80,24 +80,24 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-widest text-accent">{t?.footer?.contactUs}</h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-sm text-background/60">
+              <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
                 <span className="text-accent mt-0.5">📍</span>
                 <span>{contact.address[lang]}</span>
               </li>
               <li>
-                <a href={telHref(contact.phone)} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={telHref(contact.phone)} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
                   <span className="text-accent">📞</span>
                   {formatPhone(contact.phone)}
                 </a>
               </li>
               <li>
-                <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
                   <span className="text-accent">✉️</span>
                   {contact.email}
                 </a>
               </li>
               <li>
-                <a href={`https://wa.me/${waDigits(contact.whatsapp)}`} className="flex items-center gap-2 text-sm text-background/60 hover:text-accent transition-colors">
+                <a href={`https://wa.me/${waDigits(contact.whatsapp)}`} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
                   <span className="text-accent">💬</span>
                   {formatPhone(contact.whatsapp)}
                 </a>
@@ -108,10 +108,10 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
-          <p className="text-xs text-background/40">{t?.footer?.copyright}</p>
+          <p className="text-xs text-primary-foreground/40">{t?.footer?.copyright}</p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="text-xs text-background/40 hover:text-accent transition-colors">{t?.footer?.legal}</Link>
-            <Link href="#" className="text-xs text-background/40 hover:text-accent transition-colors">{t?.footer?.privacy}</Link>
+            <Link href="#" className="text-xs text-primary-foreground/40 hover:text-accent transition-colors">{t?.footer?.legal}</Link>
+            <Link href="#" className="text-xs text-primary-foreground/40 hover:text-accent transition-colors">{t?.footer?.privacy}</Link>
           </div>
         </div>
       </div>

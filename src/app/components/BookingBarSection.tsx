@@ -7,7 +7,7 @@ export default function BookingBarSection() {
   const { t, dir } = useSite();
 
   return (
-    <section dir={dir} className="relative z-20 -mt-12 pb-8 px-4">
+    <section dir={dir} className="relative z-20 pt-14 pb-8 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="font-serif text-2xl text-foreground">{t?.booking?.title}</h2>

@@ -3,9 +3,10 @@ import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import SectionLabel from '@/components/SectionLabel';
 
 export default function PresentationSection() {
-  const { t, dir } = useSite();
+  const { t, dir, lang, contact } = useSite();
 
   return (
     <section dir={dir} className="section-padding px-4 sm:px-6 lg:px-8 bg-secondary/30">
@@ -22,24 +23,17 @@ export default function PresentationSection() {
                 sizes="(max-width: 1024px) 100vw, 50vw" />
               
             </div>
-            {/* Floating stat card */}
-            <div className="absolute -bottom-6 right-6 lg:-right-6 bg-card border border-border rounded-2xl p-5 shadow-xl animate-float-delayed">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-xl">⭐</span>
-                </div>
-                <div>
-                  <div className="font-bold text-foreground text-lg">5.0 / 5</div>
-                  <div className="text-xs text-muted-foreground">+50 avis vérifiés</div>
-                </div>
-              </div>
+            {/* Adresse */}
+            <div className="absolute -bottom-6 right-6 lg:-right-6 bg-card border border-border rounded-xl p-5 shadow-xl">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{contact.address[lang].split(',').slice(-3, -1).join(',').trim() || 'Rabat'}</div>
+              <div className="mt-1 font-serif text-lg text-foreground">Riad Dar Soufa</div>
             </div>
           </div>
 
           {/* Text side */}
           <div className="space-y-6 pt-8 lg:pt-0">
             <div>
-              <span className="text-xs font-bold uppercase tracking-[0.4em] text-accent">{t?.presentation?.label}</span>
+              <SectionLabel number="01">{t?.presentation?.label}</SectionLabel>
               <h2 className="font-serif text-display text-foreground mt-3 leading-tight">
                 {t?.presentation?.title}
               </h2>

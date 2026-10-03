@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
 import { Language } from '@/lib/data';
@@ -8,6 +9,8 @@ import { Language } from '@/lib/data';
 export default function Header() {
   const { t, lang, setLang, isDark, toggleDark, dir } = useSite();
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const overHero = pathname === '/' && !scrolled;
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -33,16 +36,16 @@ export default function Header() {
     <header
       dir={dir}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-card/95 backdrop-blur-md shadow-sm border-b border-border'
-          : 'bg-transparent'
+        overHero
+          ? 'bg-transparent'
+          : 'bg-card/95 backdrop-blur-md shadow-sm border-b border-border'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <AppLogo size={56} />
+            <AppLogo size={56} src={overHero ? '/assets/images/app_logo_light.png' : undefined} />
             <span className="sr-only">Riad Dar Soufa</span>
           </Link>
 
@@ -52,7 +55,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="nav-underline text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 pb-0.5"
+                className={`nav-underline text-sm font-medium transition-colors duration-300 pb-0.5 ${overHero ? 'text-white/85 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {link.label}
               </Link>

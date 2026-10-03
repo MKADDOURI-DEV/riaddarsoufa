@@ -1,3 +1,11 @@
+/** Couleurs basées sur des variables CSS, avec support des modificateurs d'opacité (ex. bg-accent/10). */
+const withAlpha = (name) => ({ opacityValue }) => {
+  if (opacityValue === undefined) return `var(--${name})`;
+  const n = parseFloat(opacityValue);
+  if (Number.isNaN(n)) return `var(--${name})`;
+  return `color-mix(in srgb, var(--${name}) ${Math.round(n * 1000) / 10}%, transparent)`;
+};
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -9,31 +17,31 @@ module.exports = {
     },
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        background: withAlpha('background'),
+        foreground: withAlpha('foreground'),
         primary: {
-          DEFAULT: 'var(--primary)',
-          foreground: 'var(--primary-foreground)',
+          DEFAULT: withAlpha('primary'),
+          foreground: withAlpha('primary-foreground'),
         },
         secondary: {
-          DEFAULT: 'var(--secondary)',
-          foreground: 'var(--secondary-foreground)',
+          DEFAULT: withAlpha('secondary'),
+          foreground: withAlpha('secondary-foreground'),
         },
         accent: {
-          DEFAULT: 'var(--accent)',
-          foreground: 'var(--accent-foreground)',
+          DEFAULT: withAlpha('accent'),
+          foreground: withAlpha('accent-foreground'),
         },
         muted: {
-          DEFAULT: 'var(--muted)',
-          foreground: 'var(--muted-foreground)',
+          DEFAULT: withAlpha('muted'),
+          foreground: withAlpha('muted-foreground'),
         },
         card: {
-          DEFAULT: 'var(--card)',
-          foreground: 'var(--card-foreground)',
+          DEFAULT: withAlpha('card'),
+          foreground: withAlpha('card-foreground'),
         },
-        border: 'var(--border)',
-        input: 'var(--input)',
-        ring: 'var(--ring)',
+        border: withAlpha('border'),
+        input: withAlpha('input'),
+        ring: withAlpha('ring'),
       },
       borderRadius: {
         DEFAULT: 'var(--radius)',

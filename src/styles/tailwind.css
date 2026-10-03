@@ -3,42 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --background: #F7FAFC;
-  --foreground: #0B2A3F;
-  --primary: #0B4A6F;
+  --background: #F6F1E7;
+  --foreground: #16231F;
+  --primary: #183B35;
   --primary-foreground: #FFFFFF;
-  --secondary: #E8F1F6;
-  --secondary-foreground: #0B2A3F;
-  --accent: #1FA39A;
+  --secondary: #EAE2D0;
+  --secondary-foreground: #16231F;
+  --accent: #86652B;
   --accent-foreground: #FFFFFF;
-  --muted: #E8F1F6;
-  --muted-foreground: #5B7386;
-  --card: #FFFFFF;
-  --card-foreground: #0B2A3F;
-  --border: #D9E5EC;
-  --input: #D9E5EC;
-  --ring: #1FA39A;
-  --radius: 0.75rem;
+  --muted: #EBE4D3;
+  --muted-foreground: #656B62;
+  --card: #FCFAF5;
+  --card-foreground: #16231F;
+  --border: #DDD3BE;
+  --input: #DDD3BE;
+  --ring: #86652B;
+  --radius: 0.5rem;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-serif: 'DM Serif Display', serif;
 }
 
 .dark {
-  --background: #071C2B;
-  --foreground: #E8F1F6;
-  --primary: #1FA39A;
+  --background: #0F1F1B;
+  --foreground: #F1EBDD;
+  --primary: #2F6B5F;
   --primary-foreground: #FFFFFF;
-  --secondary: #0C2B40;
-  --secondary-foreground: #E8F1F6;
-  --accent: #2CC4B8;
-  --accent-foreground: #071C2B;
-  --muted: #0C2B40;
-  --muted-foreground: #8FA9BA;
-  --card: #0A2436;
-  --card-foreground: #E8F1F6;
-  --border: #16405A;
-  --input: #16405A;
-  --ring: #2CC4B8;
+  --secondary: #162B26;
+  --secondary-foreground: #F1EBDD;
+  --accent: #C9A15A;
+  --accent-foreground: #0F1F1B;
+  --muted: #162B26;
+  --muted-foreground: #A3AFA6;
+  --card: #132722;
+  --card-foreground: #F1EBDD;
+  --border: #25423B;
+  --input: #25423B;
+  --ring: #C9A15A;
 }
 
 @layer base {
