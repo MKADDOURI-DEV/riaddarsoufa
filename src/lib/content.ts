@@ -12,9 +12,23 @@ export const DEFAULT_CONTACT: ContactInfo = {
   facebook: SITE_CONFIG.facebook,
 };
 
-/** Clés de stockage (v2 : nouvelle liste de chambres et de services d'octobre 2026). */
-export const ROOMS_KEY = 'rooms_v2';
-export const SERVICES_KEY = 'services_v2';
+/** Clés de stockage existantes dans la base (la base n'accepte que ces clés). */
+export const ROOMS_KEY = 'rooms';
+export const SERVICES_KEY = 'services';
+/** Version du contenu : l'ancienne liste (chambres et services d'avant octobre 2026) est ignorée. */
+export const CONTENT_VERSION = 2;
+
+/** Format enregistré : { version: 2, items: [...] }. */
+export function wrapItems(items: unknown[]) {
+  return { version: CONTENT_VERSION, items };
+}
+function unwrapItems(value: unknown): unknown[] | null {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const v = value as { version?: number; items?: unknown };
+    if (v.version === CONTENT_VERSION && Array.isArray(v.items)) return v.items;
+  }
+  return null; // ancien format (simple liste) : ignoré, les valeurs par défaut s'appliquent
+}
 
 export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string; images?: string[]; /** ancien champ (une seule photo) */ image?: string };
 
@@ -51,11 +65,12 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
   if (!rows) return result;
 
   for (const row of rows) {
-    if (row.key === ROOMS_KEY && Array.isArray(row.value) && row.value.length > 0) {
-      result.rooms = row.value as Room[];
+    const items = row.key === ROOMS_KEY || row.key === SERVICES_KEY ? unwrapItems(row.value) : null;
+    if (row.key === ROOMS_KEY && items && items.length > 0) {
+      result.rooms = items as Room[];
     }
-    if (row.key === SERVICES_KEY && Array.isArray(row.value)) {
-      const stored = row.value as StoredService[];
+    if (row.key === SERVICES_KEY && items) {
+      const stored = items as StoredService[];
       result.services = stored.map((x, idx) => {
         const def = DEFAULT_CONTENT.services.find((d) => d.id === x.id);
         return {

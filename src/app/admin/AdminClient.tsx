@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
 import { MultiImageField } from './ImageUpload';
-import { DEFAULT_CONTENT, ROOMS_KEY, SERVICES_KEY, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
+import { DEFAULT_CONTENT, ROOMS_KEY, SERVICES_KEY, wrapItems, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
 type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
 
@@ -479,7 +479,8 @@ function Dashboard({ session }: { session: Session }) {
   useEffect(() => { reload(); }, [reload]);
 
   const saveKey = async (key: typeof ROOMS_KEY | typeof SERVICES_KEY | 'contact', value: unknown) => {
-    const { error } = await supabase.from('site_content').upsert({ key, value, updated_at: new Date().toISOString() });
+    const stored = key === 'contact' ? value : wrapItems(value as unknown[]);
+    const { error } = await supabase.from('site_content').upsert({ key, value: stored, updated_at: new Date().toISOString() });
     if (error) throw new Error(error.message);
   };
 
