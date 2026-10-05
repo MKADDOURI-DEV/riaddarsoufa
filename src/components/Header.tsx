@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { Language } from '@/lib/data';
 
 export default function Header() {
@@ -26,10 +27,10 @@ export default function Header() {
     { href: '/contact', label: t.nav.contact },
   ];
 
-  const languages: { code: Language; label: string; flag: string }[] = [
-    { code: 'fr', label: 'FR', flag: '🇫🇷' },
-    { code: 'en', label: 'EN', flag: '🇬🇧' },
-    { code: 'ar', label: 'ع', flag: '🇲🇦' },
+  const languages: { code: Language; label: string }[] = [
+    { code: 'fr', label: 'FR' },
+    { code: 'en', label: 'EN' },
+    { code: 'ar', label: 'ع' },
   ];
 
   return (
@@ -77,7 +78,7 @@ export default function Header() {
                   }`}
                   aria-label={`Switch to ${l.label}`}
                 >
-                  {l.flag} {l.label}
+                  {l.label}
                 </button>
               ))}
             </div>
@@ -88,7 +89,7 @@ export default function Header() {
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200"
               aria-label="Toggle dark mode"
             >
-              {isDark ? '☀️' : '🌙'}
+              {isDark ? <SunIcon className="h-5 w-5" aria-hidden="true" /> : <MoonIcon className="h-5 w-5" aria-hidden="true" />}
             </button>
 
             {/* Book CTA */}
@@ -104,7 +105,7 @@ export default function Header() {
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-sm"
               aria-label="Toggle dark mode"
             >
-              {isDark ? '☀️' : '🌙'}
+              {isDark ? <SunIcon className="h-5 w-5" aria-hidden="true" /> : <MoonIcon className="h-5 w-5" aria-hidden="true" />}
             </button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -149,7 +150,7 @@ export default function Header() {
                     : 'border-border text-muted-foreground hover:border-accent'
                 }`}
               >
-                {l.flag} {l.label}
+                {l.label}
               </button>
             ))}
           </div>

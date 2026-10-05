@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import {
+  ClockIcon, WifiIcon, SparklesIcon, MapPinIcon, TruckIcon, ChatBubbleLeftRightIcon,
+} from '@heroicons/react/24/outline';
 import AppLogo from '@/components/ui/AppLogo';
 import { ROOMS } from '@/lib/data';
 import { loadContentRows, mergeContent } from '@/lib/content';
@@ -12,7 +15,7 @@ const UI = {
   fr: {
     hours: 'Horaires', hoursNote: 'Horaires généraux du riad',
     checkin: 'Arrivée (check-in)', checkinSub: 'à partir de', checkout: 'Départ (check-out)', checkoutSub: 'avant',
-    wifi: 'Wi-Fi', network: 'Réseau', password: 'Mot de passe', copy: 'Copier', copied: 'Copié ✓',
+    wifi: 'Wi-Fi', network: 'Réseau', password: 'Mot de passe', copy: 'Copier', copied: 'Copié',
     services: 'Nos Services', rabat: 'À découvrir à Rabat', access: 'Accès & Parking',
     accessTitle: 'Comment venir', parking: 'Parking', instructions: 'Instructions',
     maps: 'Voir sur Google Maps', openMaps: 'Ouvrir dans Google Maps',
@@ -23,7 +26,7 @@ const UI = {
   en: {
     hours: 'Opening hours', hoursNote: 'General riad hours',
     checkin: 'Arrival (check-in)', checkinSub: 'from', checkout: 'Departure (check-out)', checkoutSub: 'before',
-    wifi: 'Wi-Fi', network: 'Network', password: 'Password', copy: 'Copy', copied: 'Copied ✓',
+    wifi: 'Wi-Fi', network: 'Network', password: 'Password', copy: 'Copy', copied: 'Copied',
     services: 'Our Services', rabat: 'Discover Rabat', access: 'Access & Parking',
     accessTitle: 'How to get here', parking: 'Parking', instructions: 'Instructions',
     maps: 'View on Google Maps', openMaps: 'Open in Google Maps',
@@ -33,11 +36,42 @@ const UI = {
   },
 } as const;
 
-function SectionTitle({ icon, children, id }: { icon: string; children: React.ReactNode; id: string }) {
+type IconCmp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+
+function SectionTitle({ icon: Icon, children, id }: { icon: IconCmp; children: React.ReactNode; id: string }) {
   return (
     <h2 id={id} className="scroll-mt-20 flex items-center gap-3 font-serif text-2xl text-foreground mb-4">
-      <span aria-hidden="true" className="text-xl">{icon}</span>{children}
+      <Icon className="h-6 w-6 text-accent" aria-hidden="true" />{children}
     </h2>
+  );
+}
+
+/** Carte du guide : photo d'un côté, détails de l'autre (même principe que les cartes de réservation). */
+function SplitCard({
+  image, alt, title, badge, children, footer,
+}: { image?: string; alt: string; title: string; badge?: string; children?: React.ReactNode; footer?: React.ReactNode }) {
+  const [imgOk, setImgOk] = useState(!!image);
+  return (
+    <article className="overflow-hidden rounded-[24px] border border-border bg-card">
+      <div className={imgOk ? 'grid grid-cols-[2fr_3fr] sm:grid-cols-[1fr_2fr]' : ''}>
+        {imgOk && (
+          <div className="relative min-h-[190px] bg-muted">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image} alt={alt} loading="lazy" onError={() => setImgOk(false)} className="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="flex min-w-0 flex-col p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-serif text-lg leading-snug text-foreground sm:text-2xl">{title}</h3>
+            {badge && (
+              <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-2.5 py-1 text-xs font-semibold text-accent sm:px-3 sm:text-sm">{badge}</span>
+            )}
+          </div>
+          {children}
+          {footer && <div className="mt-auto pt-4"><div className="border-t border-border pt-3 sm:pt-4">{footer}</div></div>}
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -60,7 +94,7 @@ function MapsButton({ href, label }: { href: string; label: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
       className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-2.5 text-sm font-semibold active:scale-95 transition">
-      <span aria-hidden="true">📍</span>{label}
+      <MapPinIcon className="h-4 w-4" aria-hidden="true" />{label}
     </a>
   );
 }
@@ -126,20 +160,20 @@ export default function GuideClient() {
     <div className="min-h-screen bg-background text-foreground pb-28" style={{ scrollBehavior: 'smooth' }}>
       {/* Barre du haut */}
       <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--background)_94%,transparent)] backdrop-blur border-b border-border">
-        <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <AppLogo size={44} />
           <div className="flex rounded-full border border-border p-0.5 text-sm font-semibold" role="group" aria-label="Langue / Language">
             {(['fr', 'en'] as GLang[]).map((l) => (
               <button key={l} type="button" onClick={() => changeLang(l)} aria-pressed={lang === l}
                 className={`px-3.5 py-1.5 rounded-full transition ${lang === l ? 'bg-primary text-primary-foreground' : 'text-foreground/70'}`}>
-                {l === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                {l === 'fr' ? 'FR' : 'EN'}
               </button>
             ))}
           </div>
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto px-4">
+      <main className="max-w-3xl mx-auto px-4">
         {/* Bienvenue */}
         <section className="relative mt-4 overflow-hidden rounded-3xl bg-foreground text-background">
           {heroImg && (
@@ -168,7 +202,7 @@ export default function GuideClient() {
 
         {/* Horaires */}
         <section className="mt-10">
-          <SectionTitle icon="🕐" id="horaires">{t.hours}</SectionTitle>
+          <SectionTitle icon={ClockIcon} id="horaires">{t.hours}</SectionTitle>
           <div className="grid grid-cols-2 gap-3">
             {[{ l: t.checkin, s: t.checkinSub, v: practical.checkin }, { l: t.checkout, s: t.checkoutSub, v: practical.checkout }].map((x) => (
               <div key={x.l} className="rounded-2xl border border-border bg-card p-5 text-center">
@@ -183,7 +217,7 @@ export default function GuideClient() {
 
         {/* Wi-Fi */}
         <section className="mt-10">
-          <SectionTitle icon="📶" id="wifi">{t.wifi}</SectionTitle>
+          <SectionTitle icon={WifiIcon} id="wifi">{t.wifi}</SectionTitle>
           {hasWifi ? (
             <div className="divide-y divide-border rounded-2xl border border-border bg-card">
               {practical.wifi_name && (
@@ -213,31 +247,25 @@ export default function GuideClient() {
         {/* Services */}
         {services.length > 0 && (
           <section className="mt-10">
-            <SectionTitle icon="🍽️" id="services">{t.services}</SectionTitle>
-            <div className="space-y-3">
+            <SectionTitle icon={SparklesIcon} id="services">{t.services}</SectionTitle>
+            <div className="space-y-4">
               {services.map((s) => {
                 const note = pick(s.price_note_fr, s.price_note_en, lang);
+                const desc = pick(s.description_fr, s.description_en, lang);
+                const hasPrice = s.price !== null && s.price !== undefined;
+                const name = pick(s.name_fr, s.name_en, lang);
                 return (
-                  <article key={s.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                    {s.image_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.image_url} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="h-40 w-full object-cover" />
-                    )}
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-serif text-xl text-foreground">{pick(s.name_fr, s.name_en, lang)}</h3>
-                        {s.price !== null && s.price !== undefined && (
-                          <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-3 py-1 text-sm font-semibold text-accent">
-                            {Number(s.price).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB')} {t.currency}
-                          </span>
-                        )}
+                  <SplitCard key={s.id} image={s.image_url} alt={name} title={name}
+                    footer={hasPrice ? (
+                      <div>
+                        <span className="text-2xl font-bold text-accent">{Number(s.price).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB')}</span>
+                        <span className="text-sm text-muted-foreground"> {t.currency}</span>
+                        {note && <p className="text-xs text-muted-foreground">{note}</p>}
                       </div>
-                      {note && <p className="mt-1 text-xs text-muted-foreground">{note}</p>}
-                      {pick(s.description_fr, s.description_en, lang) && (
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{pick(s.description_fr, s.description_en, lang)}</p>
-                      )}
-                    </div>
-                  </article>
+                    ) : undefined}>
+                    {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{desc}</p>}
+                    {!hasPrice && note && <p className="mt-1 text-xs text-muted-foreground">{note}</p>}
+                  </SplitCard>
                 );
               })}
             </div>
@@ -247,29 +275,18 @@ export default function GuideClient() {
         {/* Guide de Rabat */}
         {places.length > 0 && (
           <section className="mt-10">
-            <SectionTitle icon="📍" id="rabat">{t.rabat}</SectionTitle>
-            <div className="space-y-3">
+            <SectionTitle icon={MapPinIcon} id="rabat">{t.rabat}</SectionTitle>
+            <div className="space-y-4">
               {places.map((p) => {
                 const name = pick(p.name_fr, p.name_en, lang);
                 const cat = pick(p.category_fr, p.category_en, lang);
+                const desc = pick(p.description_fr, p.description_en, lang);
                 return (
-                  <article key={p.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                    {p.image_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image_url} alt={name} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="h-44 w-full object-cover" />
-                    )}
-                    <div className="p-5">
-                      {cat && <span className="inline-block rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-3 py-1 text-xs font-semibold text-accent">{cat}</span>}
-                      <h3 className="mt-2 font-serif text-xl text-foreground">{name}</h3>
-                      {pick(p.description_fr, p.description_en, lang) && (
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{pick(p.description_fr, p.description_en, lang)}</p>
-                      )}
-                      {p.address && <p className="mt-2 text-xs text-muted-foreground">{p.address}</p>}
-                      <div className="mt-4">
-                        <MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />
-                      </div>
-                    </div>
-                  </article>
+                  <SplitCard key={p.id} image={p.image_url} alt={name} title={name} badge={cat || undefined}
+                    footer={<MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />}>
+                    {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">{desc}</p>}
+                    {p.address && <p className="mt-2 text-xs text-muted-foreground">{p.address}</p>}
+                  </SplitCard>
                 );
               })}
             </div>
@@ -278,7 +295,7 @@ export default function GuideClient() {
 
         {/* Accès & Parking */}
         <section className="mt-10">
-          <SectionTitle icon="🚗" id="acces">{t.access}</SectionTitle>
+          <SectionTitle icon={TruckIcon} id="acces">{t.access}</SectionTitle>
           <div className="space-y-3">
             <div className="rounded-2xl border border-border bg-card p-5">
               <h3 className="font-serif text-xl text-foreground">{t.accessTitle}</h3>
@@ -289,7 +306,7 @@ export default function GuideClient() {
               </div>
             </div>
             <div className="rounded-2xl border border-border bg-card p-5">
-              <h3 className="font-serif text-xl text-foreground">🅿️ {t.parking}</h3>
+              <h3 className="font-serif text-xl text-foreground">{t.parking}</h3>
               {parkingText || parkingInstr ? (
                 <>
                   {parkingText && <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{parkingText}</p>}
@@ -316,8 +333,8 @@ export default function GuideClient() {
       {waOk && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--background)_96%,transparent)] backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <a href={waHref} target="_blank" rel="noopener noreferrer"
-            className="mx-auto flex max-w-xl items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-base font-semibold text-white shadow-lg active:scale-[0.98] transition">
-            <span aria-hidden="true">💬</span>{t.whatsapp}
+            className="mx-auto flex max-w-3xl items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-base font-semibold text-white shadow-lg active:scale-[0.98] transition">
+            <ChatBubbleLeftRightIcon className="h-5 w-5" aria-hidden="true" />{t.whatsapp}
           </a>
         </div>
       )}

@@ -11,15 +11,15 @@ import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeCont
 type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
 
 const ICON_CHOICES: { value: string; label: string }[] = [
-  { value: 'SparklesIcon', label: '✨ Étoiles' }, { value: 'StarIcon', label: '⭐ Étoile' },
-  { value: 'HeartIcon', label: '❤️ Cœur' }, { value: 'GiftIcon', label: '🎁 Cadeau' },
-  { value: 'SunIcon', label: '☀️ Soleil' }, { value: 'WifiIcon', label: '📶 Wi-Fi' },
-  { value: 'TruckIcon', label: '🚐 Transport' }, { value: 'CakeIcon', label: '🍰 Repas / gâteau' },
-  { value: 'MapIcon', label: '🗺️ Visites' }, { value: 'PhoneIcon', label: '📞 Téléphone' },
-  { value: 'HomeModernIcon', label: '🏠 Maison' }, { value: 'MusicalNoteIcon', label: '🎵 Musique' },
-  { value: 'BuildingStorefrontIcon', label: '🏪 Boutique' }, { value: 'KeyIcon', label: '🔑 Clé' },
-  { value: 'ClockIcon', label: '🕒 Horaires' }, { value: 'UserGroupIcon', label: '👥 Groupe' },
-  { value: 'FireIcon', label: '🔥 Feu' }, { value: 'ShieldCheckIcon', label: '🛡️ Sécurité' },
+  { value: 'SparklesIcon', label: 'Étoiles' }, { value: 'StarIcon', label: 'Étoile' },
+  { value: 'HeartIcon', label: 'Cœur' }, { value: 'GiftIcon', label: 'Cadeau' },
+  { value: 'SunIcon', label: 'Soleil' }, { value: 'WifiIcon', label: 'Wi-Fi' },
+  { value: 'TruckIcon', label: 'Transport' }, { value: 'CakeIcon', label: 'Repas / gâteau' },
+  { value: 'MapIcon', label: 'Visites' }, { value: 'PhoneIcon', label: 'Téléphone' },
+  { value: 'HomeModernIcon', label: 'Maison' }, { value: 'MusicalNoteIcon', label: 'Musique' },
+  { value: 'BuildingStorefrontIcon', label: 'Boutique' }, { value: 'KeyIcon', label: 'Clé' },
+  { value: 'ClockIcon', label: 'Horaires' }, { value: 'UserGroupIcon', label: 'Groupe' },
+  { value: 'FireIcon', label: 'Feu' }, { value: 'ShieldCheckIcon', label: 'Sécurité' },
 ];
 
 async function callAdmins(body: Record<string, unknown>) {
@@ -121,10 +121,23 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
       const j = i + d; if (j < 0 || j >= rs.length) return rs;
       const c = [...rs]; [c[i], c[j]] = [c[j], c[i]]; return c;
     });
-  const remove = (i: number) => {
-    if (rooms.length <= 4) { setMsg('Le site affiche au minimum 4 chambres : ajoutez-en une avant d’en supprimer.'); return; }
-    if (!confirm('Supprimer cette chambre ?')) return;
-    setRooms((rs) => rs.filter((_, idx) => idx !== i));
+  const clean = (list: Room[]) => list.map((r) => ({
+    ...r,
+    slug: slugify(r.slug || r.name.fr),
+    pricePerNight: Number(r.pricePerNight) || 0,
+    capacity: Number(r.capacity) || 1,
+    size: Number(r.size) || 0,
+  }));
+
+  // La suppression est enregistrée immédiatement (plus besoin de cliquer ensuite sur « Enregistrer »).
+  const remove = async (i: number) => {
+    if (rooms.length <= 1) { setMsg('Le site doit garder au moins une chambre.'); return; }
+    if (!confirm(`Supprimer définitivement « ${rooms[i].name.fr} » du site ?`)) return;
+    const next = clean(rooms.filter((_, idx) => idx !== i));
+    setSaving(true); setMsg('');
+    try { await onSave(next); setRooms(next); setMsg('Chambre supprimée. Le site est à jour.'); }
+    catch (e) { setMsg('Échec de la suppression : ' + (e as Error).message); }
+    setSaving(false);
   };
   const add = () =>
     setRooms((rs) => [...rs, {
@@ -139,20 +152,15 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
   const save = async () => {
     setSaving(true); setMsg('');
     try {
-      const cleaned = rooms.map((r) => ({
-        ...r,
-        slug: slugify(r.slug || r.name.fr),
-        pricePerNight: Number(r.pricePerNight) || 0,
-        capacity: Number(r.capacity) || 1,
-        size: Number(r.size) || 0,
-      }));
-      await onSave(cleaned); setRooms(cleaned); setMsg('✅ Chambres enregistrées. Le site est à jour.');
-    } catch (e) { setMsg('❌ Échec de l’enregistrement : ' + (e as Error).message); }
+      const cleaned = clean(rooms);
+      await onSave(cleaned); setRooms(cleaned); setMsg('Chambres enregistrées. Le site est à jour.');
+    } catch (e) { setMsg('Échec de l’enregistrement : ' + (e as Error).message); }
     setSaving(false);
   };
 
   return (
     <div>
+      {msg && <p className="mb-4 rounded-lg border border-foreground/15 bg-foreground/5 px-4 py-3 text-sm" role="status">{msg}</p>}
       {rooms.map((r, i) => (
         <details key={r.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0}>
           <summary className="cursor-pointer font-semibold text-foreground">
@@ -160,9 +168,9 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
           </summary>
           <div className="mt-4">
             <div className="flex flex-wrap gap-2 mb-4">
-              <button type="button" onClick={() => move(i, -1)} className="rounded border border-foreground/20 px-3 py-1 text-xs">↑ Monter</button>
-              <button type="button" onClick={() => move(i, 1)} className="rounded border border-foreground/20 px-3 py-1 text-xs">↓ Descendre</button>
-              <button type="button" onClick={() => remove(i)} className="rounded border border-red-300 px-3 py-1 text-xs text-red-600">Supprimer</button>
+              <button type="button" onClick={() => move(i, -1)} className="rounded border border-foreground/20 px-3 py-1 text-xs">Monter</button>
+              <button type="button" onClick={() => move(i, 1)} className="rounded border border-foreground/20 px-3 py-1 text-xs">Descendre</button>
+              <button type="button" disabled={saving} onClick={() => remove(i)} className="rounded border border-red-300 px-3 py-1 text-xs text-red-600 disabled:opacity-50">Supprimer cette chambre</button>
             </div>
             <TriField label="Nom" value={r.name} onChange={(v) => update(i, { name: v })} />
             <TriField label="Description courte" value={r.shortDesc} onChange={(v) => update(i, { shortDesc: v })} />
@@ -187,7 +195,6 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
       <div className="flex flex-wrap items-center gap-3 mt-6">
         <button type="button" onClick={add} className="rounded-lg border border-foreground/20 px-4 py-2 text-sm">+ Ajouter une chambre</button>
         <button type="button" onClick={save} disabled={saving} className="btn-primary disabled:opacity-60">{saving ? 'Enregistrement…' : 'Enregistrer les chambres'}</button>
-        {msg && <span className="text-sm" role="status">{msg}</span>}
       </div>
     </div>
   );
@@ -213,8 +220,8 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
 
   const save = async () => {
     setSaving(true); setMsg('');
-    try { await onSave(items); setMsg('✅ Services enregistrés. Le site est à jour.'); }
-    catch (e) { setMsg('❌ Échec de l’enregistrement : ' + (e as Error).message); }
+    try { await onSave(items); setMsg('Services enregistrés. Le site est à jour.'); }
+    catch (e) { setMsg('Échec de l’enregistrement : ' + (e as Error).message); }
     setSaving(false);
   };
 
@@ -281,13 +288,13 @@ function AccountsEditor() {
       setAccounts(d.admins); setMe(d.me);
       const mine = (d.admins as AdminAccount[]).find((a) => a.id === d.me);
       if (mine) setMyEmail(mine.email);
-    } catch (e) { setMsg('❌ ' + (e as Error).message); setAccounts([]); }
+    } catch (e) { setMsg('Erreur : ' + (e as Error).message); setAccounts([]); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
   const run = async (fn: () => Promise<void>) => {
     setBusy(true); setMsg('');
-    try { await fn(); } catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await fn(); } catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setBusy(false);
   };
 
@@ -304,7 +311,7 @@ function AccountsEditor() {
       email: emailChanged ? myEmail.trim() : '',
       password: myPassword,
     });
-    alert('✅ Vos identifiants ont été modifiés. Vous allez être déconnecté : reconnectez-vous avec votre nouvel email et mot de passe.');
+    alert('Vos identifiants ont été modifiés. Vous allez être déconnecté : reconnectez-vous avec votre nouvel email et mot de passe.');
     await supabase.auth.signOut();
   });
 
@@ -318,20 +325,20 @@ function AccountsEditor() {
 
   const create = () => run(async () => {
     await callAdmins({ action: 'create', email: newEmail, password: newPassword });
-    setNewEmail(''); setNewPassword(''); setMsg('✅ Compte créé. Il peut se connecter immédiatement.'); await load();
+    setNewEmail(''); setNewPassword(''); setMsg('Compte créé. Il peut se connecter immédiatement.'); await load();
   });
 
   const update = (a: AdminAccount) => run(async () => {
     const e = edits[a.id] || { email: '', password: '' };
     await callAdmins({ action: 'update', id: a.id, email: e.email.trim(), password: e.password });
     setEdits((x) => ({ ...x, [a.id]: { email: '', password: '' } }));
-    setMsg('✅ Compte modifié.'); await load();
+    setMsg('Compte modifié.'); await load();
   });
 
   const remove = (a: AdminAccount) => run(async () => {
     if (!confirm(`Supprimer le compte ${a.email} ?`)) return;
     await callAdmins({ action: 'delete', id: a.id });
-    setMsg('✅ Compte supprimé.'); await load();
+    setMsg('Compte supprimé.'); await load();
   });
 
   if (!accounts) return <p className="text-sm">Chargement…</p>;
@@ -426,8 +433,8 @@ function ContactEditor({ initial, onSave }: { initial: ContactInfo; onSave: (v: 
 
   const save = async () => {
     setSaving(true); setMsg('');
-    try { await onSave(c); setMsg('✅ Coordonnées enregistrées. Le site est à jour.'); }
-    catch (e) { setMsg('❌ Échec de l’enregistrement : ' + (e as Error).message); }
+    try { await onSave(c); setMsg('Coordonnées enregistrées. Le site est à jour.'); }
+    catch (e) { setMsg('Échec de l’enregistrement : ' + (e as Error).message); }
     setSaving(false);
   };
 
@@ -478,7 +485,7 @@ function Dashboard({ session }: { session: Session }) {
     { id: 'rooms', label: 'Chambres & prix' },
     { id: 'services', label: 'Services' },
     { id: 'contact', label: 'Contact' },
-    { id: 'guide', label: '📱 Guide d’accueil' },
+    { id: 'guide', label: 'Guide d’accueil' },
     { id: 'accounts', label: 'Mon compte' },
   ];
 

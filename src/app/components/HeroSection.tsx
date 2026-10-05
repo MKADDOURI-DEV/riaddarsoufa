@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import BookingBar from '@/components/BookingBar';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
 
@@ -33,15 +34,19 @@ export default function HeroSection() {
       </div>
 
       {/* Contenu */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pb-44 pt-36 sm:px-6 lg:px-8">
-        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 animate-fade-up">{L.overline}</p>
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pb-32 pt-32 sm:px-6 lg:px-8">
+        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 animate-fade-up">{L.overline}</p>
         <h1 className="font-serif text-hero max-w-4xl text-white animate-fade-up leading-[0.95]">Riad Dar Soufa</h1>
-        <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-white/85 sm:text-lg animate-fade-up delay-200">
+        <p className="mt-5 max-w-xl text-base font-light leading-relaxed text-white/85 sm:text-lg animate-fade-up delay-200">
           {t?.hero?.subtitle}
         </p>
-        <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row animate-fade-up delay-300">
-          <Link href="/booking" className="btn-accent px-8 py-4 text-base">{t?.hero?.cta1}</Link>
-          <Link href="/rooms" className="btn-secondary !border-white/60 px-8 py-4 text-base !text-white hover:!border-white hover:!text-white">{t?.hero?.cta2}</Link>
+        <div className="mt-4 animate-fade-up delay-200">
+          <Link href="/rooms" className="text-sm font-semibold text-white/90 underline underline-offset-4 hover:text-white">{t?.hero?.cta2}</Link>
+        </div>
+
+        {/* Barre de réservation visible dès l'arrivée sur le site */}
+        <div id="reserver" className="mt-8 scroll-mt-24 animate-fade-up delay-300">
+          <BookingBar className="max-w-6xl" />
         </div>
       </div>
 

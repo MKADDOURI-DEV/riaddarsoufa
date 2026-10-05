@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import { ChatBubbleLeftRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { waDigits } from '@/lib/content';
 
 function RoomDetailContent() {
@@ -83,7 +84,7 @@ function RoomDetailContent() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {room?.amenities?.map((amenity, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
-                      <span className="text-accent text-xs">✓</span>
+                      <CheckIcon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                       {amenity?.[lang]}
                     </div>
                   ))}
@@ -140,7 +141,7 @@ function RoomDetailContent() {
                   rel="noopener noreferrer"
                   className="btn-secondary w-full text-sm"
                 >
-                  💬 WhatsApp
+                  <ChatBubbleLeftRightIcon className="h-4 w-4" aria-hidden="true" />WhatsApp
                 </a>
               </div>
             </div>

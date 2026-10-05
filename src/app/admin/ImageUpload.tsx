@@ -95,11 +95,11 @@ export function MultiImageField({
             <div key={`${url}-${i}`} className="rounded-lg border border-foreground/15 p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="" className="h-24 w-full rounded object-cover" />
-              <p className="mt-1 text-center text-[11px] text-foreground/60">{i === 0 ? '⭐ Principale' : `Photo ${i + 1}`}</p>
+              <p className="mt-1 text-center text-[11px] text-foreground/60">{i === 0 ? 'Photo principale' : `Photo ${i + 1}`}</p>
               <div className="mt-1 flex justify-center gap-1">
                 <button type="button" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Avancer" className="rounded border border-foreground/20 px-2 py-0.5 text-xs disabled:opacity-30">←</button>
                 <button type="button" disabled={i === value.length - 1} onClick={() => move(i, 1)} aria-label="Reculer" className="rounded border border-foreground/20 px-2 py-0.5 text-xs disabled:opacity-30">→</button>
-                <button type="button" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Retirer" className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-600">✕</button>
+                <button type="button" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Retirer" className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-600">Retirer</button>
               </div>
             </div>
           ))}

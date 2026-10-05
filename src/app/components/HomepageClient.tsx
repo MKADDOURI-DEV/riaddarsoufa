@@ -5,7 +5,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import HeroSection from './HeroSection';
-import BookingBarSection from './BookingBarSection';
 import PresentationSection from './PresentationSection';
 import RoomsPreviewSection from './RoomsPreviewSection';
 import TestimonialsSection from './TestimonialsSection';
@@ -17,7 +16,6 @@ export default function HomepageClient() {
         <Header />
         <main>
           <HeroSection />
-          <BookingBarSection />
           <PresentationSection />
           <RoomsPreviewSection />
           <TestimonialsSection />

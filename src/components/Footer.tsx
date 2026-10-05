@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
+import { MapPinIcon, PhoneIcon, EnvelopeIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { formatPhone, telHref, waDigits } from '@/lib/content';
 
 export default function Footer() {
@@ -81,24 +82,24 @@ export default function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-accent">{t?.footer?.contactUs}</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
-                <span className="text-accent mt-0.5">📍</span>
+                <MapPinIcon className="h-4 w-4 text-accent mt-0.5 shrink-0" aria-hidden="true" />
                 <span>{contact.address[lang]}</span>
               </li>
               <li>
                 <a href={telHref(contact.phone)} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
-                  <span className="text-accent">📞</span>
+                  <PhoneIcon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                   {formatPhone(contact.phone)}
                 </a>
               </li>
               <li>
                 <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
-                  <span className="text-accent">✉️</span>
+                  <EnvelopeIcon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                   {contact.email}
                 </a>
               </li>
               <li>
                 <a href={`https://wa.me/${waDigits(contact.whatsapp)}`} className="flex items-center gap-2 text-sm text-primary-foreground/60 hover:text-accent transition-colors">
-                  <span className="text-accent">💬</span>
+                  <ChatBubbleLeftRightIcon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                   {formatPhone(contact.whatsapp)}
                 </a>
               </li>

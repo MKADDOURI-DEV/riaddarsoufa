@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import { MapPinIcon, PhoneIcon, ChatBubbleLeftRightIcon, EnvelopeIcon, MapIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { formatPhone, telHref, waDigits } from '@/lib/content';
 
 interface FormData {
@@ -50,11 +51,16 @@ function ContactContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 1200);
+    // Le formulaire n'a pas de serveur d'envoi : le message est transmis au riad via WhatsApp,
+    // déjà rédigé, pour qu'il arrive réellement à destination.
+    const text = [
+      `${formData.prenom} ${formData.nom}`.trim(),
+      formData.email, formData.telephone,
+      formData.sujet ? `Sujet : ${formData.sujet}` : '',
+      '', formData.message,
+    ].filter((x, i) => x || i === 4).join('\n');
+    window.open(`https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+    setSubmitted(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -67,25 +73,25 @@ function ContactContent() {
 
   const contactItems = [
   {
-    icon: '📍',
+    icon: MapPinIcon,
     label: t.contact.address,
     value: contact.address[lang],
     href: contact.googleMapsUrl
   },
   {
-    icon: '📞',
+    icon: PhoneIcon,
     label: t.contact.phone,
     value: formatPhone(contact.phone),
     href: telHref(contact.phone)
   },
   {
-    icon: '💬',
+    icon: ChatBubbleLeftRightIcon,
     label: t.contact.whatsapp,
     value: formatPhone(contact.whatsapp),
     href: `https://wa.me/${waDigits(contact.whatsapp)}`
   },
   {
-    icon: '✉️',
+    icon: EnvelopeIcon,
     label: t.contact.email,
     value: contact.email,
     href: `mailto:${contact.email}`
@@ -132,7 +138,7 @@ function ContactContent() {
                   className="flex items-start gap-4 p-4 bg-card border border-border rounded-xl hover:border-accent hover:-translate-y-0.5 transition-all duration-200 group">
                   
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 text-lg group-hover:bg-accent/20 transition-colors">
-                      {item.icon}
+                      <item.icon className="h-5 w-5 text-accent" aria-hidden="true" />
                     </div>
                     <div>
                       <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-0.5">{item.label}</div>
@@ -155,7 +161,7 @@ function ContactContent() {
                   
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-card/90 backdrop-blur-sm rounded-xl px-4 py-3 text-center shadow-lg border border-border">
-                      <div className="text-lg mb-1">📍</div>
+                      <MapPinIcon className="h-6 w-6 mx-auto mb-1 text-accent" aria-hidden="true" />
                       <div className="font-semibold text-sm text-foreground">Riad Dar Soufa</div>
                       <div className="text-xs text-muted-foreground">Médina de Rabat</div>
                     </div>
@@ -167,7 +173,7 @@ function ContactContent() {
                   rel="noopener noreferrer"
                   className="btn-secondary w-full text-sm">
                   
-                  🗺️ {t.contact.openMaps}
+                  <MapIcon className="h-4 w-4" aria-hidden="true" />{t.contact.openMaps}
                 </a>
               </div>
             </div>
@@ -177,10 +183,10 @@ function ContactContent() {
               <div className="bg-card border border-border rounded-2xl p-6 sm:p-8">
                 {submitted ?
                 <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-3xl">
-                      ✅
+                    <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                      <CheckIcon className="h-8 w-8 text-green-700 dark:text-green-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-serif text-2xl text-foreground">Message envoyé !</h3>
+                    <h3 className="font-serif text-2xl text-foreground">Message prêt dans WhatsApp</h3>
                     <p className="text-muted-foreground max-w-sm leading-relaxed">{t.contact.formSuccess}</p>
                     <button
                     onClick={() => {setSubmitted(false);setFormData({ nom: '', prenom: '', email: '', telephone: '', sujet: '', message: '' });}}

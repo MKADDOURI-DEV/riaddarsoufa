@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import { useSite } from '@/context/SiteContext';
+import { PhoneIcon } from '@heroicons/react/24/outline';
 import { formatPhone, telHref } from '@/lib/content';
 import Icon from '@/components/ui/AppIcon';
 
@@ -69,7 +70,7 @@ function ServicesContent() {
           <div className="mt-10 rounded-2xl bg-foreground text-background p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="font-serif text-xl">{lang === 'ar' ? 'هل لديك سؤال؟ اتصل بنا' : lang === 'en' ? 'Any question? Call our reception' : 'Une question ? Appelez notre réception'}</p>
             <a href={telHref(contact.phone)} className="btn-accent text-sm px-6 py-3">
-              📞 {formatPhone(contact.phone)}
+              <PhoneIcon className="h-4 w-4" aria-hidden="true" />{formatPhone(contact.phone)}
             </a>
           </div>
         </section>

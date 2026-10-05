@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { Room } from '@/lib/data';
 import { useSite } from '@/context/SiteContext';
+import { UserIcon, Squares2X2Icon, HomeModernIcon } from '@heroicons/react/24/outline';
 
 interface RoomCardProps {
   room: Room;
@@ -60,13 +61,13 @@ export default function RoomCard({ room, featured = false }: RoomCardProps) {
         {/* Meta */}
         <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1">
           <span className="flex items-center gap-1">
-            <span>👤</span> {room.capacity} {t.rooms.persons}
+            <UserIcon className="h-4 w-4" aria-hidden="true" /> {room.capacity} {t.rooms.persons}
           </span>
           <span className="flex items-center gap-1">
-            <span>📐</span> {room.size} {t.rooms.sqm}
+            <Squares2X2Icon className="h-4 w-4" aria-hidden="true" /> {room.size} {t.rooms.sqm}
           </span>
           <span className="flex items-center gap-1">
-            <span>🛏️</span> {room.bedType[lang]}
+            <HomeModernIcon className="h-4 w-4" aria-hidden="true" /> {room.bedType[lang]}
           </span>
         </div>
 

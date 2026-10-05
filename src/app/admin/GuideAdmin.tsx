@@ -85,26 +85,26 @@ function PracticalEditor() {
 
   const save = async () => {
     setSaving(true); setMsg('');
-    try { await saveSetting('practical', p); setMsg('✅ Enregistré. Visible tout de suite sur /guide.'); }
-    catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await saveSetting('practical', p); setMsg('Enregistré. Visible tout de suite sur /guide.'); }
+    catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setSaving(false);
   };
 
   return (
     <div>
-      <h3 className="font-semibold mb-3">🕐 Horaires généraux du riad</h3>
+      <h3 className="font-semibold mb-3">Horaires généraux du riad</h3>
       <div className="grid grid-cols-2 gap-4">
         <Field label="Check-in (à partir de)"><input type="time" className={inputCls} value={p.checkin} onChange={(e) => set({ checkin: e.target.value })} /></Field>
         <Field label="Check-out (avant)"><input type="time" className={inputCls} value={p.checkout} onChange={(e) => set({ checkout: e.target.value })} /></Field>
       </div>
 
-      <h3 className="font-semibold mt-6 mb-3">📶 Wi-Fi</h3>
+      <h3 className="font-semibold mt-6 mb-3">Wi-Fi</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Nom du réseau"><input className={inputCls} value={p.wifi_name} onChange={(e) => set({ wifi_name: e.target.value })} /></Field>
         <Field label="Mot de passe Wi-Fi"><input className={inputCls} value={p.wifi_password} onChange={(e) => set({ wifi_password: e.target.value })} /></Field>
       </div>
 
-      <h3 className="font-semibold mt-6 mb-3">🚗 Accès</h3>
+      <h3 className="font-semibold mt-6 mb-3">Accès</h3>
       <BiField label="Description (comment venir)" multiline fr={p.access.description_fr} en={p.access.description_en}
         onChange={(v) => set({ access: { ...p.access, description_fr: v.fr, description_en: v.en } })} />
       <Field label="Adresse"><input className={inputCls} value={p.access.address} onChange={(e) => set({ access: { ...p.access, address: e.target.value } })} /></Field>
@@ -112,7 +112,7 @@ function PracticalEditor() {
         <input className={inputCls} value={p.access.maps_url} onChange={(e) => set({ access: { ...p.access, maps_url: e.target.value } })} />
       </Field>
 
-      <h3 className="font-semibold mt-6 mb-3">🅿️ Parking</h3>
+      <h3 className="font-semibold mt-6 mb-3">Parking</h3>
       <BiField label="Description" multiline fr={p.parking.description_fr} en={p.parking.description_en}
         onChange={(v) => set({ parking: { ...p.parking, description_fr: v.fr, description_en: v.en } })} />
       <BiField label="Instructions" multiline fr={p.parking.instructions_fr} en={p.parking.instructions_en}
@@ -183,8 +183,8 @@ function useRows<T extends { id: string }>(table: 'guide_services' | 'guide_plac
 function RowActions({ i, n, onMove, onRemove }: { i: number; n: number; onMove: (d: -1 | 1) => void; onRemove: () => void }) {
   return (
     <div className="flex flex-wrap gap-2 mb-4">
-      <button type="button" disabled={i === 0} onClick={() => onMove(-1)} className="rounded border border-foreground/20 px-3 py-1 text-xs disabled:opacity-40">↑ Monter</button>
-      <button type="button" disabled={i === n - 1} onClick={() => onMove(1)} className="rounded border border-foreground/20 px-3 py-1 text-xs disabled:opacity-40">↓ Descendre</button>
+      <button type="button" disabled={i === 0} onClick={() => onMove(-1)} className="rounded border border-foreground/20 px-3 py-1 text-xs disabled:opacity-40">Monter</button>
+      <button type="button" disabled={i === n - 1} onClick={() => onMove(1)} className="rounded border border-foreground/20 px-3 py-1 text-xs disabled:opacity-40">Descendre</button>
       <button type="button" onClick={() => { if (confirm('Supprimer définitivement ?')) onRemove(); }} className="rounded border border-red-300 px-3 py-1 text-xs text-red-600">Supprimer</button>
     </div>
   );
@@ -199,8 +199,8 @@ function ServicesEditor() {
 
   const doSave = async () => {
     setSaving(true); setMsg('');
-    try { await save(); setMsg('✅ Services enregistrés. Visibles sur /guide.'); }
-    catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await save(); setMsg('Services enregistrés. Visibles sur /guide.'); }
+    catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setSaving(false);
   };
 
@@ -255,8 +255,8 @@ function PlacesEditor() {
 
   const doSave = async () => {
     setSaving(true); setMsg('');
-    try { await save(); setMsg('✅ Lieux enregistrés. Visibles sur /guide.'); }
-    catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await save(); setMsg('Lieux enregistrés. Visibles sur /guide.'); }
+    catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setSaving(false);
   };
 
@@ -305,8 +305,8 @@ function WhatsappEditor() {
   const set = (patch: Partial<GuideWhatsapp>) => setAll({ ...all, whatsapp: { ...w, ...patch } });
   const save = async () => {
     setSaving(true); setMsg('');
-    try { await saveSetting('whatsapp', w); setMsg('✅ Enregistré. Visible tout de suite sur /guide.'); }
-    catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await saveSetting('whatsapp', w); setMsg('Enregistré. Visible tout de suite sur /guide.'); }
+    catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setSaving(false);
   };
   const digits = w.number.replace(/\D/g, '');
@@ -336,8 +336,8 @@ function SettingsEditor() {
   const link = typeof window !== 'undefined' ? `${window.location.origin}/guide` : '/guide';
   const save = async () => {
     setSaving(true); setMsg('');
-    try { await saveSetting('welcome', w); setMsg('✅ Enregistré. Visible tout de suite sur /guide.'); }
-    catch (e) { setMsg('❌ ' + (e as Error).message); }
+    try { await saveSetting('welcome', w); setMsg('Enregistré. Visible tout de suite sur /guide.'); }
+    catch (e) { setMsg('Erreur : ' + (e as Error).message); }
     setSaving(false);
   };
   return (
@@ -349,7 +349,7 @@ function SettingsEditor() {
         <div className="flex gap-2 mt-3">
           <button type="button" className="rounded-lg border border-foreground/20 px-3 py-2 text-sm"
             onClick={async () => { try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* ignore */ } }}>
-            {copied ? 'Copié ✓' : 'Copier le lien'}
+            {copied ? 'Copié' : 'Copier le lien'}
           </button>
           <a href="/guide" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-foreground/20 px-3 py-2 text-sm">Ouvrir le guide</a>
         </div>

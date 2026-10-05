@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useSite } from '@/context/SiteContext';
+import { StarIcon } from '@heroicons/react/24/solid';
 import SectionLabel from '@/components/SectionLabel';
 import { TESTIMONIALS } from '@/lib/data';
 
@@ -29,7 +30,7 @@ export default function TestimonialsSection() {
               {/* Stars */}
               <div className="flex gap-1">
                 {Array.from({ length: testimonial?.rating })?.map((_, i) => (
-                  <span key={i} className="text-accent text-sm">★</span>
+                  <StarIcon key={i} className="h-4 w-4 text-accent" aria-hidden="true" />
                 ))}
               </div>
 
