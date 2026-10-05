@@ -46,22 +46,28 @@ function SectionTitle({ icon: Icon, children, id }: { icon: IconCmp; children: R
   );
 }
 
-/** Carte du guide : photo d'un côté, détails de l'autre (même principe que les cartes de réservation). */
+/** Carte du guide : photo d'un côté, détails de l'autre (même principe que les cartes de réservation).
+ *  Sans photo (ou photo introuvable), un visuel de remplacement garde la mise en page moitié / moitié. */
 function SplitCard({
-  image, alt, title, badge, children, footer,
-}: { image?: string; alt: string; title: string; badge?: string; children?: React.ReactNode; footer?: React.ReactNode }) {
-  const [imgOk, setImgOk] = useState(!!image);
+  image, alt, title, badge, children, footer, placeholder: Placeholder,
+}: { image?: string; alt: string; title: string; badge?: string; children?: React.ReactNode; footer?: React.ReactNode; placeholder: IconCmp }) {
+  const [broken, setBroken] = useState(false);
+  const showImg = !!image && !broken;
   return (
     <article className="overflow-hidden rounded-[24px] border border-border bg-card">
-      <div className={imgOk ? 'grid grid-cols-[2fr_3fr] sm:grid-cols-[1fr_2fr]' : ''}>
-        {imgOk && (
-          <div className="relative min-h-[190px] bg-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt={alt} loading="lazy" onError={() => setImgOk(false)} className="absolute inset-0 h-full w-full object-cover" />
-          </div>
-        )}
+      <div className="grid grid-cols-2 sm:grid-cols-[2fr_3fr]">
+        <div className="relative min-h-[200px] bg-[color-mix(in_srgb,var(--accent)_12%,var(--card))]">
+          {showImg ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={image} alt={alt} loading="lazy" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Placeholder className="h-10 w-10 text-accent/60" aria-hidden="true" />
+            </div>
+          )}
+        </div>
         <div className="flex min-w-0 flex-col p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <h3 className="font-serif text-lg leading-snug text-foreground sm:text-2xl">{title}</h3>
             {badge && (
               <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-2.5 py-1 text-xs font-semibold text-accent sm:px-3 sm:text-sm">{badge}</span>
@@ -255,7 +261,7 @@ export default function GuideClient() {
                 const hasPrice = s.price !== null && s.price !== undefined;
                 const name = pick(s.name_fr, s.name_en, lang);
                 return (
-                  <SplitCard key={s.id} image={s.image_url} alt={name} title={name}
+                  <SplitCard key={s.id} image={s.image_url} alt={name} title={name} placeholder={SparklesIcon}
                     footer={hasPrice ? (
                       <div>
                         <span className="text-2xl font-bold text-accent">{Number(s.price).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB')}</span>
@@ -282,7 +288,7 @@ export default function GuideClient() {
                 const cat = pick(p.category_fr, p.category_en, lang);
                 const desc = pick(p.description_fr, p.description_en, lang);
                 return (
-                  <SplitCard key={p.id} image={p.image_url} alt={name} title={name} badge={cat || undefined}
+                  <SplitCard key={p.id} image={p.image_url} alt={name} title={name} badge={cat || undefined} placeholder={MapPinIcon}
                     footer={<MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />}>
                     {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">{desc}</p>}
                     {p.address && <p className="mt-2 text-xs text-muted-foreground">{p.address}</p>}

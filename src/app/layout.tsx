@@ -1,20 +1,21 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, DM_Serif_Display } from 'next/font/google';
+import { Montserrat, Cormorant_Garamond } from 'next/font/google';
 import '../styles/tailwind.css';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+// Typographie inspirée de Dar Amastan : titres en Cormorant Garamond, texte en Montserrat.
+const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-plus-jakarta-sans',
+  variable: '--font-montserrat',
   display: 'swap',
 });
 
-const dmSerifDisplay = DM_Serif_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500', '600'],
   style: ['normal', 'italic'],
-  variable: '--font-dm-serif',
+  variable: '--font-cormorant',
   display: 'swap',
 });
 
@@ -43,8 +44,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${plusJakartaSans.variable} ${dmSerifDisplay.variable}`}>
-      <body className={plusJakartaSans.className}>
+    <html lang="fr" className={`${montserrat.variable} ${cormorant.variable}`}>
+      <body className={montserrat.className}>
         {children}
 
         <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Friaddarsou4308back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.20" />
