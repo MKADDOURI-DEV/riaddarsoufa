@@ -11,7 +11,7 @@ export const DEFAULT_CONTACT: ContactInfo = {
   facebook: SITE_CONFIG.facebook,
 };
 
-export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string };
+export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string; image?: string };
 
 /** Services de base (mise en page fixe) : ils ne peuvent pas être supprimés, seulement modifiés. */
 export const BASE_SERVICE_IDS = new Set(SERVICES.map((s) => s.id));
@@ -51,6 +51,7 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
           name: x.name,
           description: x.description,
           available: x.available,
+          image: x.image || '',
         } as Service;
       });
     }

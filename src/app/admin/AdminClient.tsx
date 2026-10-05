@@ -5,7 +5,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
-import { MultiImageField } from './ImageUpload';
+import { ImageField, MultiImageField } from './ImageUpload';
 import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
 type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
@@ -247,6 +247,9 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
                   </select>
                 </div>
               )}
+              <ImageField bucket="site-images" label="Photo du service" value={s.image || ''}
+                emptyHint="Aucune photo téléversée : une photo d’exemple est affichée sur la page Services. Téléversez la vôtre pour la remplacer."
+                onChange={(url) => update(i, { image: url })} />
               <label className="flex items-center gap-2 text-sm text-foreground mb-3">
                 <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
                 Afficher ce service sur le site
@@ -518,7 +521,7 @@ function Dashboard({ session }: { session: Session }) {
             {tab === 'rooms' && <RoomsEditor key="r" initial={content.rooms} onSave={(v) => saveKey('rooms', v)} />}
             {tab === 'services' && (
               <ServicesEditor key="s"
-                initial={content.services.map(({ id, name, description, available, icon }) => ({ id, name, description, available, icon }))}
+                initial={content.services.map(({ id, name, description, available, icon, image }) => ({ id, name, description, available, icon, image: image || '' }))}
                 onSave={(v) => saveKey('services', v)} />
             )}
             {tab === 'guide' && <GuideAdmin key="g" />}

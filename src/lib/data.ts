@@ -23,6 +23,8 @@ export interface Service {
   description: { fr: string; en: string; ar: string };
   available: boolean;
   colSpan?: number;
+  /** Photo téléversée depuis l'admin (sinon une photo d'exemple est affichée). */
+  image?: string;
 }
 
 export interface ContactInfo {
