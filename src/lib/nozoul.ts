@@ -5,25 +5,20 @@
  * sur le moteur Nozoul avec ces informations dans l'adresse, pour ne pas avoir
  * à les ressaisir.
  *
- * NOMS DES PARAMÈTRES : si le moteur Nozoul attend d'autres noms
- * (ex. « arrival » au lieu de « checkIn »), il suffit de les changer ici.
+ * FORMAT ATTENDU PAR NOZOUL (le même que sur le site du Motel Safari) :
+ *   ?period=AAAA-MM-JJ,AAAA-MM-JJ&adults=2&child=1&ages=5
+ *   - period : date d'arrivée et date de départ séparées par une virgule
+ *   - adults : nombre d'adultes
+ *   - child  : nombre d'enfants (seulement s'il y en a)
+ *   - ages   : âge de chaque enfant, séparés par une virgule
  */
 export const NOZOUL_BOOKING_URL =
   'https://dar-soufa.nozoul.ma/#/be/0dc0d11c-96e3-4523-aa45-2307da0abfc6/book';
 
-export const NOZOUL_PARAMS = {
-  checkIn: 'checkIn',
-  checkOut: 'checkOut',
-  adults: 'adults',
-  children: 'children',
-  childrenAges: 'childrenAges',
-  // Langue du visiteur, transmise au moteur (sans effet si Nozoul l'ignore)
-  lang: 'lang',
-} as const;
-
 export const MAX_ADULTS = 8;
 export const MAX_CHILDREN = 6;
-export const MAX_CHILD_AGE = 17;
+/** Âge maximum d'un enfant pour le moteur Nozoul */
+export const MAX_CHILD_AGE = 12;
 
 export interface StaySearch {
   checkIn: string; // AAAA-MM-JJ
@@ -31,20 +26,18 @@ export interface StaySearch {
   adults: number;
   children: number;
   childrenAges: number[];
-  lang?: string; // 'fr' | 'en'
 }
 
 /** Adresse du moteur Nozoul avec les informations du client pré-remplies. */
 export function buildNozoulUrl(s: StaySearch): string {
   const q = new URLSearchParams();
-  if (s.checkIn) q.set(NOZOUL_PARAMS.checkIn, s.checkIn);
-  if (s.checkOut) q.set(NOZOUL_PARAMS.checkOut, s.checkOut);
-  q.set(NOZOUL_PARAMS.adults, String(s.adults));
-  q.set(NOZOUL_PARAMS.children, String(s.children));
+  q.set('period', `${s.checkIn},${s.checkOut}`);
+  q.set('adults', String(s.adults || 1));
   if (s.children > 0) {
-    q.set(NOZOUL_PARAMS.childrenAges, s.childrenAges.slice(0, s.children).join(','));
+    q.set('child', String(s.children));
+    const ages = s.childrenAges.slice(0, s.children).filter((a) => a >= 0).join(',');
+    if (ages) q.set('ages', ages);
   }
-  if (s.lang) q.set(NOZOUL_PARAMS.lang, s.lang);
   // Route « hash » : les paramètres se placent après la route du moteur.
   return `${NOZOUL_BOOKING_URL}?${q.toString()}`;
 }

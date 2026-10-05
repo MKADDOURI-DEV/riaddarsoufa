@@ -58,7 +58,7 @@ export function goToNozoul(
   const ages = form.childrenAges.slice(0, form.children);
   if (ages.length < form.children || ages.some((a) => a < 0)) { setError(t.errorAge); return false; }
   setError('');
-  window.location.href = buildNozoulUrl({ ...form, childrenAges: ages, lang });
+  window.location.href = buildNozoulUrl({ ...form, childrenAges: ages });
   return true;
 }
 
