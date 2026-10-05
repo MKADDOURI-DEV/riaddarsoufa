@@ -226,7 +226,7 @@ function ServicesEditor() {
                 <BiField label="Précision sur le prix (ex : par personne)" fr={s.price_note_fr} en={s.price_note_en} onChange={(v) => update(i, { price_note_fr: v.fr, price_note_en: v.en })} />
               </div>
             </div>
-            <UploadField bucket="guide-images" value={s.image_url} onChange={(url) => update(i, { image_url: url })} />
+            <UploadField bucket="guide-images" emptyHint="Aucune photo téléversée : une photo d’exemple est affichée sur /guide. Téléversez la vôtre pour la remplacer." value={s.image_url} onChange={(url) => update(i, { image_url: url })} />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
               Service disponible (affiché sur /guide)
@@ -275,7 +275,7 @@ function PlacesEditor() {
             <Field label="Lien Google Maps" hint="Laissez vide : un lien de recherche Google Maps sera créé avec le nom du lieu.">
               <input className={inputCls} value={p.maps_url} onChange={(e) => update(i, { maps_url: e.target.value })} />
             </Field>
-            <UploadField bucket="guide-images" value={p.image_url} onChange={(url) => update(i, { image_url: url })} />
+            <UploadField bucket="guide-images" emptyHint="Aucune photo téléversée : une photo d’exemple est affichée sur /guide. Téléversez la vôtre pour la remplacer." value={p.image_url} onChange={(url) => update(i, { image_url: url })} />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={p.active} onChange={(e) => update(i, { active: e.target.checked })} />
               Lieu actif (affiché sur /guide)

@@ -28,8 +28,8 @@ export async function uploadImage(file: File, bucket: 'guide-images' | 'site-ima
 
 /** Une seule image : téléversement uniquement (aucun lien à saisir). */
 export function ImageField({
-  value, onChange, bucket, label = 'Image',
-}: { value: string; onChange: (url: string) => void; bucket: 'guide-images' | 'site-images'; label?: string }) {
+  value, onChange, bucket, label = 'Image', emptyHint,
+}: { value: string; onChange: (url: string) => void; bucket: 'guide-images' | 'site-images'; label?: string; emptyHint?: string }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
@@ -48,6 +48,7 @@ export function ImageField({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={value} alt="" className="mb-2 h-32 w-full max-w-xs rounded-lg object-cover border border-foreground/15" />
       )}
+      {!value && emptyHint && <p className="mb-2 text-xs text-foreground/60">{emptyHint}</p>}
       <div className="flex flex-wrap items-center gap-2">
         <label className="cursor-pointer rounded-lg border border-foreground/20 px-3 py-2 text-sm">
           {busy ? 'Envoi…' : value ? 'Changer l’image' : 'Téléverser une image'}

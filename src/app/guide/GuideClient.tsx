@@ -8,7 +8,7 @@ import AppLogo from '@/components/ui/AppLogo';
 import { ROOMS } from '@/lib/data';
 import { loadContentRows, mergeContent } from '@/lib/content';
 import {
-  EMPTY_GUIDE, GLang, GuideData, loadGuide, mapsLink, pick, whatsappHref,
+  EMPTY_GUIDE, GLang, GuideData, examplePlacePhoto, exampleServicePhoto, loadGuide, mapsLink, pick, whatsappHref,
 } from '@/lib/guide';
 
 const UI = {
@@ -255,13 +255,13 @@ export default function GuideClient() {
           <section className="mt-10">
             <SectionTitle icon={SparklesIcon} id="services">{t.services}</SectionTitle>
             <div className="space-y-4">
-              {services.map((s) => {
+              {services.map((s, idx) => {
                 const note = pick(s.price_note_fr, s.price_note_en, lang);
                 const desc = pick(s.description_fr, s.description_en, lang);
                 const hasPrice = s.price !== null && s.price !== undefined;
                 const name = pick(s.name_fr, s.name_en, lang);
                 return (
-                  <SplitCard key={s.id} image={s.image_url} alt={name} title={name} placeholder={SparklesIcon}
+                  <SplitCard key={s.id} image={s.image_url || exampleServicePhoto(s.name_fr || s.name_en, idx)} alt={name} title={name} placeholder={SparklesIcon}
                     footer={hasPrice ? (
                       <div>
                         <span className="text-2xl font-bold text-accent">{Number(s.price).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB')}</span>
@@ -283,12 +283,12 @@ export default function GuideClient() {
           <section className="mt-10">
             <SectionTitle icon={MapPinIcon} id="rabat">{t.rabat}</SectionTitle>
             <div className="space-y-4">
-              {places.map((p) => {
+              {places.map((p, idx) => {
                 const name = pick(p.name_fr, p.name_en, lang);
                 const cat = pick(p.category_fr, p.category_en, lang);
                 const desc = pick(p.description_fr, p.description_en, lang);
                 return (
-                  <SplitCard key={p.id} image={p.image_url} alt={name} title={name} badge={cat || undefined} placeholder={MapPinIcon}
+                  <SplitCard key={p.id} image={p.image_url || examplePlacePhoto(p.name_fr || p.name_en, p.category_fr || p.category_en, idx)} alt={name} title={name} badge={cat || undefined} placeholder={MapPinIcon}
                     footer={<MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />}>
                     {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">{desc}</p>}
                     {p.address && <p className="mt-2 text-xs text-muted-foreground">{p.address}</p>}
