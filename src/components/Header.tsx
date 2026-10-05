@@ -5,10 +5,9 @@ import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import { Language } from '@/lib/data';
 
 export default function Header() {
-  const { t, lang, setLang, isDark, toggleDark, dir } = useSite();
+  const { t, isDark, toggleDark, dir } = useSite();
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const overHero = pathname === '/' && !scrolled;
@@ -27,11 +26,6 @@ export default function Header() {
     { href: '/contact', label: t.nav.contact },
   ];
 
-  const languages: { code: Language; label: string }[] = [
-    { code: 'fr', label: 'FR' },
-    { code: 'en', label: 'EN' },
-    { code: 'ar', label: 'ع' },
-  ];
 
   return (
     <header
@@ -65,24 +59,6 @@ export default function Header() {
 
           {/* Right Controls */}
           <div className={`hidden lg:flex items-center gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-            {/* Language Switcher */}
-            <div className="flex items-center gap-1 bg-muted rounded-full px-2 py-1">
-              {languages.map(l => (
-                <button
-                  key={l.code}
-                  onClick={() => setLang(l.code)}
-                  className={`text-xs font-semibold px-2 py-1 rounded-full transition-all duration-200 ${
-                    lang === l.code
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  aria-label={`Switch to ${l.label}`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
@@ -138,22 +114,6 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          {/* Mobile Language Switcher */}
-          <div className="flex items-center gap-2 pt-2">
-            {languages.map(l => (
-              <button
-                key={l.code}
-                onClick={() => { setLang(l.code); setMenuOpen(false); }}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
-                  lang === l.code
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'border-border text-muted-foreground hover:border-accent'
-                }`}
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
           <Link
             href="/booking"
             onClick={() => setMenuOpen(false)}

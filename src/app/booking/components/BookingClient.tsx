@@ -85,7 +85,7 @@ function BookingContent() {
                       <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5"><UserIcon className="h-4 w-4" aria-hidden="true" />{room.capacity} {t.rooms.persons}</span>
                         <span className="inline-flex items-center gap-1.5"><HomeModernIcon className="h-4 w-4" aria-hidden="true" />{room.bedType[lang]}</span>
-                        <span className="inline-flex items-center gap-1.5"><Squares2X2Icon className="h-4 w-4" aria-hidden="true" />{room.size} {t.rooms.sqm}</span>
+                        {room.size > 0 && <span className="inline-flex items-center gap-1.5"><Squares2X2Icon className="h-4 w-4" aria-hidden="true" />{room.size} {t.rooms.sqm}</span>}
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {room.amenities.slice(0, 4).map((a, i) => (
@@ -95,7 +95,12 @@ function BookingContent() {
                     </div>
                     <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-border pt-5">
                       <div>
-                        {nights > 0 ? (
+                        {room.pricePerNight <= 0 ? (
+                          <>
+                            <div className="text-sm text-muted-foreground">Tarif selon les dates</div>
+                            <div className="text-sm text-muted-foreground">Prix exact affiché à l’étape suivante</div>
+                          </>
+                        ) : nights > 0 ? (
                           <>
                             <span className="text-3xl font-bold text-accent">{(room.pricePerNight * nights).toLocaleString('fr-FR')}</span>
                             <span className="text-muted-foreground"> {t.common.mad}</span>

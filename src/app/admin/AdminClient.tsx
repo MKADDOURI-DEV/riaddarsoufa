@@ -5,8 +5,8 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
-import { ImageField, MultiImageField } from './ImageUpload';
-import { DEFAULT_CONTENT, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
+import { MultiImageField } from './ImageUpload';
+import { DEFAULT_CONTENT, ROOMS_KEY, SERVICES_KEY, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
 type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
 
@@ -44,16 +44,15 @@ const labelCls = 'block text-xs font-semibold uppercase tracking-wide text-foreg
 function TriField({
   label, value, onChange, multiline = false,
 }: { label: string; value: Tri; onChange: (v: Tri) => void; multiline?: boolean }) {
-  const langs: { k: keyof Tri; flag: string; dir?: 'rtl' }[] = [
-    { k: 'fr', flag: 'FR' }, { k: 'en', flag: 'EN' }, { k: 'ar', flag: 'AR', dir: 'rtl' },
-  ];
+  // Site en français uniquement : seul le champ FR est affiché.
+  const langs: { k: keyof Tri; flag: string; dir?: 'rtl' }[] = [{ k: 'fr', flag: '' }];
   return (
     <div className="mb-4">
       <span className={labelCls}>{label}</span>
       <div className="space-y-2">
         {langs.map(({ k, flag, dir }) => (
           <div key={k} className="flex items-start gap-2">
-            <span className="mt-2 w-7 text-xs font-bold text-accent">{flag}</span>
+            {flag && <span className="mt-2 w-7 text-xs font-bold text-accent">{flag}</span>}
             {multiline ? (
               <textarea rows={4} dir={dir} className={inputCls} value={value?.[k] ?? ''}
                 onChange={(e) => onChange({ ...value, [k]: e.target.value })} />
@@ -142,10 +141,10 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
   const add = () =>
     setRooms((rs) => [...rs, {
       id: String(Date.now()), slug: `nouvelle-chambre-${rs.length + 1}`,
-      name: { fr: 'Nouvelle chambre', en: 'New room', ar: 'غرفة جديدة' },
+      name: { fr: 'Nouvelle chambre', en: 'Nouvelle chambre', ar: 'Nouvelle chambre' },
       shortDesc: { fr: '', en: '', ar: '' }, description: { fr: '', en: '', ar: '' },
-      capacity: 2, bedType: { fr: 'Lit double', en: 'Double bed', ar: 'سرير مزدوج' },
-      size: 20, pricePerNight: 800, images: rs[0]?.images?.slice(0, 1) ?? [],
+      capacity: 2, bedType: { fr: 'Lit double', en: 'Lit double', ar: 'Lit double' },
+      size: 0, pricePerNight: 0, images: rs[0]?.images?.slice(0, 1) ?? [],
       amenities: rs[0]?.amenities ?? [], available: true,
     }]);
 
@@ -164,7 +163,7 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
       {rooms.map((r, i) => (
         <details key={r.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0}>
           <summary className="cursor-pointer font-semibold text-foreground">
-            {i + 1}. {r.name.fr} — {Number(r.pricePerNight).toLocaleString()} MAD {r.available ? '' : '(indisponible)'}
+            {i + 1}. {r.name.fr}{Number(r.pricePerNight) > 0 ? ` — ${Number(r.pricePerNight).toLocaleString('fr-FR')} MAD` : ''} {r.available ? '' : '(indisponible)'}
           </summary>
           <div className="mt-4">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -177,11 +176,11 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
             <TriField label="Description complète" multiline value={r.description} onChange={(v) => update(i, { description: v })} />
             <TriField label="Type de lit" value={r.bedType} onChange={(v) => update(i, { bedType: v })} />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div><label className={labelCls}>Prix / nuit (MAD)</label>
+              <div><label className={labelCls}>Prix / nuit (MAD, 0 = non affiché)</label>
                 <input type="number" min={0} className={inputCls} value={r.pricePerNight} onChange={(e) => update(i, { pricePerNight: Number(e.target.value) })} /></div>
               <div><label className={labelCls}>Capacité (personnes)</label>
                 <input type="number" min={1} className={inputCls} value={r.capacity} onChange={(e) => update(i, { capacity: Number(e.target.value) })} /></div>
-              <div><label className={labelCls}>Surface (m²)</label>
+              <div><label className={labelCls}>Surface (m², 0 = non affichée)</label>
                 <input type="number" min={0} className={inputCls} value={r.size} onChange={(e) => update(i, { size: Number(e.target.value) })} /></div>
             </div>
             <label className="flex items-center gap-2 mb-4 text-sm text-foreground">
@@ -210,8 +209,8 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
   const add = () =>
     setItems((xs) => [...xs, {
       id: `svc-${Date.now()}`, icon: 'SparklesIcon', available: true,
-      name: { fr: 'Nouveau service', en: 'New service', ar: 'خدمة جديدة' },
-      description: { fr: '', en: '', ar: '' },
+      name: { fr: 'Nouveau service', en: 'Nouveau service', ar: 'Nouveau service' },
+      description: { fr: '', en: '', ar: '' }, images: [],
     }]);
   const remove = (i: number) => {
     if (!confirm('Supprimer ce service ?')) return;
@@ -247,9 +246,9 @@ function ServicesEditor({ initial, onSave }: { initial: StoredService[]; onSave:
                   </select>
                 </div>
               )}
-              <ImageField bucket="site-images" label="Photo du service" value={s.image || ''}
-                emptyHint="Aucune photo téléversée : une photo d’exemple est affichée sur la page Services. Téléversez la vôtre pour la remplacer."
-                onChange={(url) => update(i, { image: url })} />
+              <MultiImageField bucket="site-images" label="Photos du service" value={s.images || []}
+                onChange={(images) => update(i, { images, image: undefined })} />
+              <p className="-mt-2 mb-4 text-xs text-foreground/60">Les photos d’exemple de départ peuvent être retirées (bouton « Retirer ») et remplacées par les vôtres. Sans photo, le service s’affiche avec son icône. Avec plusieurs photos, les visiteurs peuvent les faire défiler. Pensez à « Enregistrer les services ».</p>
               <label className="flex items-center gap-2 text-sm text-foreground mb-3">
                 <input type="checkbox" checked={s.available} onChange={(e) => update(i, { available: e.target.checked })} />
                 Afficher ce service sur le site
@@ -479,7 +478,7 @@ function Dashboard({ session }: { session: Session }) {
   }, []);
   useEffect(() => { reload(); }, [reload]);
 
-  const saveKey = async (key: 'rooms' | 'services' | 'contact', value: unknown) => {
+  const saveKey = async (key: typeof ROOMS_KEY | typeof SERVICES_KEY | 'contact', value: unknown) => {
     const { error } = await supabase.from('site_content').upsert({ key, value, updated_at: new Date().toISOString() });
     if (error) throw new Error(error.message);
   };
@@ -518,11 +517,11 @@ function Dashboard({ session }: { session: Session }) {
         {loadError && <p className="text-sm text-red-600 mb-4">{loadError}</p>}
         {!content ? <p className="text-sm">Chargement…</p> : (
           <>
-            {tab === 'rooms' && <RoomsEditor key="r" initial={content.rooms} onSave={(v) => saveKey('rooms', v)} />}
+            {tab === 'rooms' && <RoomsEditor key="r" initial={content.rooms} onSave={(v) => saveKey(ROOMS_KEY, v)} />}
             {tab === 'services' && (
               <ServicesEditor key="s"
-                initial={content.services.map(({ id, name, description, available, icon, image }) => ({ id, name, description, available, icon, image: image || '' }))}
-                onSave={(v) => saveKey('services', v)} />
+                initial={content.services.map(({ id, name, description, available, icon, images }) => ({ id, name, description, available, icon, images: images || [] }))}
+                onSave={(v) => saveKey(SERVICES_KEY, v)} />
             )}
             {tab === 'guide' && <GuideAdmin key="g" />}
             {tab === 'accounts' && <AccountsEditor key="a" />}

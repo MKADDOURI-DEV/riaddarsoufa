@@ -50,10 +50,12 @@ export default function RoomCard({ room, featured = false }: RoomCardProps) {
       <div className="p-5 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-serif text-lg text-foreground leading-tight">{room.name[lang]}</h3>
-          <div className="text-right flex-shrink-0">
-            <span className="text-accent font-bold text-lg">{room.pricePerNight.toLocaleString()}</span>
-            <span className="text-muted-foreground text-xs"> {t.common.mad}{t.rooms.perNight}</span>
-          </div>
+          {room.pricePerNight > 0 && (
+            <div className="text-right flex-shrink-0">
+              <span className="text-accent font-bold text-lg">{room.pricePerNight.toLocaleString('fr-FR')}</span>
+              <span className="text-muted-foreground text-xs"> {t.common.mad}{t.rooms.perNight}</span>
+            </div>
+          )}
         </div>
 
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{room.shortDesc[lang]}</p>
@@ -63,9 +65,11 @@ export default function RoomCard({ room, featured = false }: RoomCardProps) {
           <span className="flex items-center gap-1">
             <UserIcon className="h-4 w-4" aria-hidden="true" /> {room.capacity} {t.rooms.persons}
           </span>
-          <span className="flex items-center gap-1">
-            <Squares2X2Icon className="h-4 w-4" aria-hidden="true" /> {room.size} {t.rooms.sqm}
-          </span>
+          {room.size > 0 && (
+            <span className="flex items-center gap-1">
+              <Squares2X2Icon className="h-4 w-4" aria-hidden="true" /> {room.size} {t.rooms.sqm}
+            </span>
+          )}
           <span className="flex items-center gap-1">
             <HomeModernIcon className="h-4 w-4" aria-hidden="true" /> {room.bedType[lang]}
           </span>

@@ -28,16 +28,15 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function BiField({
   label, fr, en, onChange, multiline = false,
 }: { label: string; fr: string; en: string; onChange: (v: { fr: string; en: string }) => void; multiline?: boolean }) {
-  const rows: { k: 'fr' | 'en'; flag: string; v: string }[] = [
-    { k: 'fr', flag: 'FR', v: fr }, { k: 'en', flag: 'EN', v: en },
-  ];
+  // Guide en français uniquement : seul le champ FR est affiché.
+  const rows: { k: 'fr' | 'en'; flag: string; v: string }[] = [{ k: 'fr', flag: '', v: fr }];
   return (
     <div className="mb-4">
       <span className={labelCls}>{label}</span>
       <div className="space-y-2">
         {rows.map((r) => (
           <div key={r.k} className="flex items-start gap-2">
-            <span className="mt-2 w-7 text-xs font-bold text-accent">{r.flag}</span>
+            {r.flag && <span className="mt-2 w-7 text-xs font-bold text-accent">{r.flag}</span>}
             {multiline ? (
               <textarea rows={3} className={inputCls} value={r.v} onChange={(e) => onChange({ fr, en, [r.k]: e.target.value })} />
             ) : (

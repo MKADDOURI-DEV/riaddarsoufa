@@ -79,6 +79,7 @@ function RoomDetailContent() {
               </div>
 
               {/* Amenities */}
+              {(room?.amenities?.length ?? 0) > 0 && (
               <div className="space-y-4">
                 <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">{t?.rooms?.amenities}</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -90,6 +91,7 @@ function RoomDetailContent() {
                   ))}
                 </div>
               </div>
+              )}
             </div>
 
             {/* Right: Booking Card */}
@@ -97,10 +99,14 @@ function RoomDetailContent() {
               <div className="sticky top-24 bg-card border border-border rounded-2xl p-6 space-y-6 shadow-xl">
                 {/* Price */}
                 <div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-serif text-4xl text-accent italic">{room?.pricePerNight?.toLocaleString()}</span>
-                    <span className="text-muted-foreground text-sm">{t?.common?.mad} {t?.rooms?.perNight}</span>
-                  </div>
+                  {room && room.pricePerNight > 0 ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-serif text-4xl text-accent italic">{room.pricePerNight.toLocaleString('fr-FR')}</span>
+                      <span className="text-muted-foreground text-sm">{t?.common?.mad} {t?.rooms?.perNight}</span>
+                    </div>
+                  ) : (
+                    <p className="font-serif text-2xl text-foreground">Tarif selon les dates</p>
+                  )}
                   <div className={`inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-3 py-1 rounded-full ${
                     room?.available ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                   }`}>
@@ -114,8 +120,8 @@ function RoomDetailContent() {
                   {[
                     { label: t?.rooms?.capacity, value: `${room?.capacity} ${t?.rooms?.persons}` },
                     { label: t?.rooms?.bedType, value: room?.bedType?.[lang] },
-                    { label: t?.rooms?.size, value: `${room?.size} ${t?.rooms?.sqm}` },
-                  ]?.map((item, i) => (
+                    { label: t?.rooms?.size, value: room && room.size > 0 ? `${room.size} ${t?.rooms?.sqm}` : '' },
+                  ]?.filter((x) => x.value)?.map((item, i) => (
                     <div key={i} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">{item?.label}</span>
                       <span className="font-medium text-foreground">{item?.value}</span>

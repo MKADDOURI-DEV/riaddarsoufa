@@ -158,6 +158,8 @@ export function examplePlacePhoto(name: string, category: string, index: number)
 export function exampleServicePhoto(name: string, index: number): string {
   const t = norm(name);
   if (/hammam|spa|massage|soin/.test(t)) return SERVICE_PHOTOS.spa;
+  if (/transfert|aeroport|airport|navette|taxi/.test(t)) return PLACE_PHOTOS.medina;
+  if (/lit |lit$|bebe|chambre/.test(t)) return SERVICE_PHOTOS.patio;
   if (/excursion|visite|tour|guide|shopping|souk/.test(t)) return SERVICE_PHOTOS.souk;
   if (/petit|dejeuner|breakfast|diner|dinner|repas|cuisine|terrasse|the|tea/.test(t)) return SERVICE_PHOTOS.terrasse;
   const all = Object.values(SERVICE_PHOTOS);

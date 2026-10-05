@@ -18,7 +18,8 @@ interface SiteContextType {
 const SiteContext = createContext<SiteContextType | null>(null);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Language>('fr');
+  // Site en français uniquement.
+  const lang: Language = 'fr';
   const [isDark, setIsDark] = useState(false);
   const [content, setContent] = useState(DEFAULT_CONTENT);
 
@@ -32,21 +33,16 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('rds-lang') as Language | null;
     const savedDark = localStorage.getItem('rds-dark');
-    if (savedLang && ['fr', 'en', 'ar'].includes(savedLang)) setLangState(savedLang);
+    document.documentElement.lang = 'fr';
+    document.documentElement.dir = 'ltr';
     if (savedDark === 'true') {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     }
   }, []);
 
-  const setLang = useCallback((newLang: Language) => {
-    setLangState(newLang);
-    localStorage.setItem('rds-lang', newLang);
-    document.documentElement.lang = newLang;
-    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-  }, []);
+  const setLang = useCallback((newLang: Language) => { void newLang; }, []);
 
   const toggleDark = useCallback(() => {
     setIsDark(prev => {
@@ -62,7 +58,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const t = TRANSLATIONS[lang];
-  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+  const dir: 'ltr' | 'rtl' = 'ltr';
 
   return (
     <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: content.rooms, services: content.services, contact: content.contact }}>

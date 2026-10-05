@@ -106,24 +106,12 @@ function MapsButton({ href, label }: { href: string; label: string }) {
 }
 
 export default function GuideClient() {
-  const [lang, setLang] = useState<GLang>('fr');
+  // Guide en français uniquement.
+  const lang: GLang = 'fr';
   const [data, setData] = useState<GuideData>(EMPTY_GUIDE);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [fallbackWa, setFallbackWa] = useState('');
   const t = UI[lang];
-
-  // Langue : choix mémorisé, sinon langue du téléphone
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('guide-lang');
-      if (saved === 'fr' || saved === 'en') { setLang(saved); return; }
-    } catch { /* ignore */ }
-    if (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('en')) setLang('en');
-  }, []);
-  const changeLang = (l: GLang) => {
-    setLang(l);
-    try { localStorage.setItem('guide-lang', l); } catch { /* ignore */ }
-  };
 
   // Données en direct depuis la base (admin -> base -> /guide)
   useEffect(() => {
@@ -168,14 +156,6 @@ export default function GuideClient() {
       <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--background)_94%,transparent)] backdrop-blur border-b border-border">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <AppLogo size={44} />
-          <div className="flex rounded-full border border-border p-0.5 text-sm font-semibold" role="group" aria-label="Langue / Language">
-            {(['fr', 'en'] as GLang[]).map((l) => (
-              <button key={l} type="button" onClick={() => changeLang(l)} aria-pressed={lang === l}
-                className={`px-3.5 py-1.5 rounded-full transition ${lang === l ? 'bg-primary text-primary-foreground' : 'text-foreground/70'}`}>
-                {l === 'fr' ? 'FR' : 'EN'}
-              </button>
-            ))}
-          </div>
         </div>
       </header>
 

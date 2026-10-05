@@ -59,10 +59,12 @@ export default function RoomsPreviewSection() {
                       <p className="text-sm text-muted-foreground line-clamp-1">{room.shortDesc?.[lang]}</p>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-4">
-                      <div className="text-right">
-                        <span className="text-accent font-bold text-xl">{room.pricePerNight?.toLocaleString('fr-FR')}</span>
-                        <span className="text-muted-foreground text-xs"> {t?.common?.mad}{t?.rooms?.perNight}</span>
-                      </div>
+                      {room.pricePerNight > 0 && (
+                        <div className="text-right">
+                          <span className="text-accent font-bold text-xl">{room.pricePerNight?.toLocaleString('fr-FR')}</span>
+                          <span className="text-muted-foreground text-xs"> {t?.common?.mad}{t?.rooms?.perNight}</span>
+                        </div>
+                      )}
                       <Link href={`/room-detail?slug=${room.slug}`} className="btn-primary text-sm py-2.5 px-5">{t?.rooms?.viewRoom}</Link>
                     </div>
                   </div>
@@ -71,7 +73,9 @@ export default function RoomsPreviewSection() {
                     <h3 className="font-serif text-lg text-foreground mb-1">{room.name?.[lang]}</h3>
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{room.shortDesc?.[lang]}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-accent font-bold">{room.pricePerNight?.toLocaleString('fr-FR')} {t?.common?.mad}<span className="text-muted-foreground text-xs font-normal">{t?.rooms?.perNight}</span></span>
+                      {room.pricePerNight > 0 ? (
+                        <span className="text-accent font-bold">{room.pricePerNight?.toLocaleString('fr-FR')} {t?.common?.mad}<span className="text-muted-foreground text-xs font-normal">{t?.rooms?.perNight}</span></span>
+                      ) : <span className="text-xs text-muted-foreground">{room.capacity} {t?.rooms?.persons}</span>}
                       <Link href={`/room-detail?slug=${room.slug}`} className="text-xs font-semibold text-primary hover:text-accent transition-colors">
                         {t?.rooms?.viewRoom} →
                       </Link>

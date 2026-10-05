@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { SiteProvider } from '@/context/SiteContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -9,7 +9,42 @@ import { useSite } from '@/context/SiteContext';
 import { PhoneIcon } from '@heroicons/react/24/outline';
 import { formatPhone, telHref } from '@/lib/content';
 import Icon from '@/components/ui/AppIcon';
-import { exampleServicePhoto } from '@/lib/guide';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+
+/** Photos d'un service : une seule, ou plusieurs avec flèches pour défiler. Sans photo : l'icône du service. */
+function ServicePhotos({ images, alt, icon, n }: { images: string[]; alt: string; icon: string; n: number }) {
+  const [i, setI] = useState(0);
+  const count = images.length;
+  if (count === 0) {
+    return (
+      <div className="relative flex aspect-[4/3] items-center justify-center bg-[color-mix(in_srgb,var(--accent)_10%,var(--card))]">
+        <Icon name={icon === 'HomeIcon' ? 'HomeModernIcon' : icon} size={56} className="text-accent/60" />
+      </div>
+    );
+  }
+  const cur = Math.min(i, count - 1);
+  return (
+    <div className="img-hover relative aspect-[4/3] overflow-hidden">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={images[cur]} alt={alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      {count > 1 && (
+        <>
+          <button type="button" onClick={() => setI((cur - 1 + count) % count)} aria-label="Photo précédente"
+            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 p-2 text-white hover:bg-black/60">
+            <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => setI((cur + 1) % count)} aria-label="Photo suivante"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 p-2 text-white hover:bg-black/60">
+            <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </>
+      )}
+      <span className="absolute bottom-3 right-3 text-xs font-semibold text-white/90">
+        {count > 1 ? `${cur + 1} / ${count}` : String(n).padStart(2, '0')}
+      </span>
+    </div>
+  );
+}
 
 function ServicesContent() {
   const { t, lang, dir, services: SERVICES, contact } = useSite();
@@ -58,13 +93,10 @@ function ServicesContent() {
             <div className="space-y-20 lg:space-y-28">
               {visible.map((s, i) => {
                 const photoRight = i % 2 === 1;
-                const img = s.image || exampleServicePhoto(s.name.fr || s.name.en, i);
                 return (
                   <article key={s.id} className={`grid grid-cols-1 items-center gap-8 lg:gap-16 ${photoRight ? 'md:grid-cols-[2fr_3fr]' : 'md:grid-cols-[3fr_2fr]'}`}>
-                    <div className={`img-hover relative aspect-[4/3] overflow-hidden ${photoRight ? 'md:order-2' : 'md:order-1'}`}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img} alt={s.name[lang]} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                      <span className="absolute bottom-3 right-3 text-xs font-semibold text-white/90">{String(i + 1).padStart(2, '0')}</span>
+                    <div className={photoRight ? 'md:order-2' : 'md:order-1'}>
+                      <ServicePhotos images={s.images || []} alt={s.name[lang]} icon={s.icon} n={i + 1} />
                     </div>
                     <div className={`max-w-md ${photoRight ? 'md:order-1 md:justify-self-end' : 'md:order-2'}`}>
                       <div className="mb-4 flex items-center gap-3 text-accent">

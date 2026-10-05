@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { ROOMS, SERVICES, SITE_CONFIG, Room, Service, ContactInfo } from '@/lib/data';
+import { exampleServicePhoto } from '@/lib/guide';
 
 export const DEFAULT_CONTACT: ContactInfo = {
   address: SITE_CONFIG.address,
@@ -11,7 +12,11 @@ export const DEFAULT_CONTACT: ContactInfo = {
   facebook: SITE_CONFIG.facebook,
 };
 
-export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string; image?: string };
+/** Clés de stockage (v2 : nouvelle liste de chambres et de services d'octobre 2026). */
+export const ROOMS_KEY = 'rooms_v2';
+export const SERVICES_KEY = 'services_v2';
+
+export type StoredService = Pick<Service, 'id' | 'name' | 'description' | 'available'> & { icon?: string; images?: string[]; /** ancien champ (une seule photo) */ image?: string };
 
 /** Services de base (mise en page fixe) : ils ne peuvent pas être supprimés, seulement modifiés. */
 export const BASE_SERVICE_IDS = new Set(SERVICES.map((s) => s.id));
@@ -22,9 +27,17 @@ export interface SiteContent {
   contact: ContactInfo;
 }
 
+/** Photos de départ d'un service : photo d'exemple tant que l'admin n'a jamais enregistré de photos pour lui.
+ *  Elles apparaissent dans l'admin comme des photos normales : on peut les retirer ou en ajouter d'autres. */
+function startPhotos(images: unknown, legacy: string | undefined, name: string, index: number): string[] {
+  if (Array.isArray(images)) return images.filter((x): x is string => typeof x === 'string' && !!x);
+  if (legacy) return [legacy];
+  return [exampleServicePhoto(name, index)];
+}
+
 export const DEFAULT_CONTENT: SiteContent = {
   rooms: ROOMS,
-  services: SERVICES,
+  services: SERVICES.map((s, i) => ({ ...s, images: startPhotos(s.images, undefined, s.name.fr, i) })),
   contact: DEFAULT_CONTACT,
 };
 
@@ -38,12 +51,12 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
   if (!rows) return result;
 
   for (const row of rows) {
-    if (row.key === 'rooms' && Array.isArray(row.value) && row.value.length > 0) {
+    if (row.key === ROOMS_KEY && Array.isArray(row.value) && row.value.length > 0) {
       result.rooms = row.value as Room[];
     }
-    if (row.key === 'services' && Array.isArray(row.value)) {
+    if (row.key === SERVICES_KEY && Array.isArray(row.value)) {
       const stored = row.value as StoredService[];
-      result.services = stored.map((x) => {
+      result.services = stored.map((x, idx) => {
         const def = DEFAULT_CONTENT.services.find((d) => d.id === x.id);
         return {
           id: x.id,
@@ -51,7 +64,7 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
           name: x.name,
           description: x.description,
           available: x.available,
-          image: x.image || '',
+          images: startPhotos(x.images, x.image, x.name?.fr || x.name?.en || '', idx),
         } as Service;
       });
     }
