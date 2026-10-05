@@ -12,7 +12,7 @@ export default function TestimonialsSection() {
     <section dir={dir} className="section-padding px-4 sm:px-6 lg:px-8 bg-primary text-primary-foreground relative overflow-hidden">
       {/* Background ornament */}
       <div className="absolute top-0 right-0 font-serif text-[20vw] italic opacity-[0.04] leading-none pointer-events-none select-none text-primary-foreground">
-        {lang === 'ar' ? 'ضيوف' : 'Hôtes'}
+        {lang === 'ar' ? 'ضيوف' : lang === 'en' ? 'Guests' : 'Hôtes'}
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">

@@ -13,6 +13,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 /** Photos d'un service : une seule, ou plusieurs avec flèches pour défiler. Sans photo : l'icône du service. */
 function ServicePhotos({ images, alt, icon, n }: { images: string[]; alt: string; icon: string; n: number }) {
+  const { lang } = useSite();
   const [i, setI] = useState(0);
   const count = images.length;
   if (count === 0) {
@@ -29,11 +30,11 @@ function ServicePhotos({ images, alt, icon, n }: { images: string[]; alt: string
       <img src={images[cur]} alt={alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
       {count > 1 && (
         <>
-          <button type="button" onClick={() => setI((cur - 1 + count) % count)} aria-label="Photo précédente"
+          <button type="button" onClick={() => setI((cur - 1 + count) % count)} aria-label={lang === 'en' ? 'Previous photo' : 'Photo précédente'}
             className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 p-2 text-white hover:bg-black/60">
             <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button type="button" onClick={() => setI((cur + 1) % count)} aria-label="Photo suivante"
+          <button type="button" onClick={() => setI((cur + 1) % count)} aria-label={lang === 'en' ? 'Next photo' : 'Photo suivante'}
             className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 p-2 text-white hover:bg-black/60">
             <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
           </button>

@@ -10,6 +10,7 @@ import { loadContentRows, mergeContent } from '@/lib/content';
 import {
   EMPTY_GUIDE, GLang, GuideData, examplePlacePhoto, exampleServicePhoto, loadGuide, mapsLink, pick, whatsappHref,
 } from '@/lib/guide';
+import { DEFAULT_LANG, detectLang, storeLang } from '@/lib/lang';
 
 const UI = {
   fr: {
@@ -106,8 +107,11 @@ function MapsButton({ href, label }: { href: string; label: string }) {
 }
 
 export default function GuideClient() {
-  // Guide en français uniquement.
-  const lang: GLang = 'fr';
+  // Guide bilingue FR / EN (même choix de langue que le site)
+  const [lang, setLangState] = useState<GLang>(DEFAULT_LANG);
+  useEffect(() => { setLangState(detectLang()); }, []);
+  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  const setLang = (l: GLang) => { setLangState(l); storeLang(l); };
   const [data, setData] = useState<GuideData>(EMPTY_GUIDE);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [fallbackWa, setFallbackWa] = useState('');
@@ -156,6 +160,14 @@ export default function GuideClient() {
       <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--background)_94%,transparent)] backdrop-blur border-b border-border">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <AppLogo size={44} />
+          <div role="group" aria-label="Langue / Language" className="flex items-center rounded-full border border-border p-0.5">
+            {(['fr', 'en'] as const).map((l) => (
+              <button key={l} type="button" onClick={() => setLang(l)} aria-pressed={lang === l}
+                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider transition-colors ${lang === l ? 'bg-accent text-white' : 'text-muted-foreground'}`}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 

@@ -55,6 +55,36 @@ export const DEFAULT_CONTENT: SiteContent = {
   contact: DEFAULT_CONTACT,
 };
 
+type Tri = { fr: string; en: string; ar: string };
+function isTri(v: unknown): v is Tri {
+  return !!v && typeof v === 'object' && typeof (v as Tri).fr === 'string';
+}
+
+/** Traduction anglaise par défaut pour un texte enregistré avant le passage du site en FR / EN :
+ *  si l'anglais enregistré est une simple copie du français et que ce français est celui du code,
+ *  on reprend la traduction anglaise du code. Un texte modifié dans l'admin n'est jamais touché. */
+function upgradeTri(stored: unknown, def: unknown): unknown {
+  if (!isTri(stored) || !isTri(def)) return stored;
+  const en = (stored.en || '').trim();
+  if ((!en || en === stored.fr) && stored.fr === def.fr && def.en && def.en !== def.fr) {
+    return { ...stored, en: def.en };
+  }
+  return stored;
+}
+function upgradeItem<T extends { id: string }>(item: T, defaults: { id: string }[]): T {
+  const def = defaults.find((d) => d.id === item.id) as Record<string, unknown> | undefined;
+  if (!def) return item;
+  const out: Record<string, unknown> = { ...item };
+  for (const [k, v] of Object.entries(item)) {
+    if (Array.isArray(v) && Array.isArray(def[k])) {
+      out[k] = v.map((x, i) => upgradeTri(x, (def[k] as unknown[])[i]));
+    } else {
+      out[k] = upgradeTri(v, def[k]);
+    }
+  }
+  return out as T;
+}
+
 /** Fusionne le contenu stocké (base de données) avec les valeurs par défaut du code. */
 export function mergeContent(rows: { key: string; value: unknown }[] | null): SiteContent {
   const result: SiteContent = {
@@ -67,7 +97,7 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
   for (const row of rows) {
     const items = row.key === ROOMS_KEY || row.key === SERVICES_KEY ? unwrapItems(row.value) : null;
     if (row.key === ROOMS_KEY && items && items.length > 0) {
-      result.rooms = items as Room[];
+      result.rooms = (items as Room[]).map((r) => upgradeItem(r, ROOMS));
     }
     if (row.key === SERVICES_KEY && items) {
       const stored = items as StoredService[];
@@ -76,8 +106,8 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
         return {
           id: x.id,
           icon: x.icon || def?.icon || 'SparklesIcon',
-          name: x.name,
-          description: x.description,
+          name: upgradeTri(x.name, def?.name) as Service['name'],
+          description: upgradeTri(x.description, def?.description) as Service['description'],
           available: x.available,
           images: startPhotos(x.images, x.image, x.name?.fr || x.name?.en || '', idx),
         } as Service;
@@ -88,7 +118,7 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
       result.contact = {
         ...DEFAULT_CONTENT.contact,
         ...c,
-        address: { ...DEFAULT_CONTENT.contact.address, ...(c.address || {}) },
+        address: upgradeTri({ ...DEFAULT_CONTENT.contact.address, ...(c.address || {}) }, DEFAULT_CONTENT.contact.address) as ContactInfo['address'],
       };
     }
   }

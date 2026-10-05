@@ -17,6 +17,8 @@ export const NOZOUL_PARAMS = {
   adults: 'adults',
   children: 'children',
   childrenAges: 'childrenAges',
+  // Langue du visiteur, transmise au moteur (sans effet si Nozoul l'ignore)
+  lang: 'lang',
 } as const;
 
 export const MAX_ADULTS = 8;
@@ -29,6 +31,7 @@ export interface StaySearch {
   adults: number;
   children: number;
   childrenAges: number[];
+  lang?: string; // 'fr' | 'en'
 }
 
 /** Adresse du moteur Nozoul avec les informations du client pré-remplies. */
@@ -41,6 +44,7 @@ export function buildNozoulUrl(s: StaySearch): string {
   if (s.children > 0) {
     q.set(NOZOUL_PARAMS.childrenAges, s.childrenAges.slice(0, s.children).join(','));
   }
+  if (s.lang) q.set(NOZOUL_PARAMS.lang, s.lang);
   // Route « hash » : les paramètres se placent après la route du moteur.
   return `${NOZOUL_BOOKING_URL}?${q.toString()}`;
 }

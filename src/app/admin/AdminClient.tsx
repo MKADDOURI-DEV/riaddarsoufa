@@ -44,8 +44,8 @@ const labelCls = 'block text-xs font-semibold uppercase tracking-wide text-foreg
 function TriField({
   label, value, onChange, multiline = false,
 }: { label: string; value: Tri; onChange: (v: Tri) => void; multiline?: boolean }) {
-  // Site en français uniquement : seul le champ FR est affiché.
-  const langs: { k: keyof Tri; flag: string; dir?: 'rtl' }[] = [{ k: 'fr', flag: '' }];
+  // Site bilingue : un champ français et un champ anglais (vide en anglais = le français s'affiche)
+  const langs: { k: keyof Tri; flag: string; dir?: 'rtl' }[] = [{ k: 'fr', flag: 'FR' }, { k: 'en', flag: 'EN' }];
   return (
     <div className="mb-4">
       <span className={labelCls}>{label}</span>

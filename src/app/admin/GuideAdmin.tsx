@@ -28,8 +28,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function BiField({
   label, fr, en, onChange, multiline = false,
 }: { label: string; fr: string; en: string; onChange: (v: { fr: string; en: string }) => void; multiline?: boolean }) {
-  // Guide en français uniquement : seul le champ FR est affiché.
-  const rows: { k: 'fr' | 'en'; flag: string; v: string }[] = [{ k: 'fr', flag: '', v: fr }];
+  // Guide bilingue : un champ français et un champ anglais (vide en anglais = le français s'affiche)
+  const rows: { k: 'fr' | 'en'; flag: string; v: string }[] = [{ k: 'fr', flag: 'FR', v: fr }, { k: 'en', flag: 'EN', v: en }];
   return (
     <div className="mb-4">
       <span className={labelCls}>{label}</span>

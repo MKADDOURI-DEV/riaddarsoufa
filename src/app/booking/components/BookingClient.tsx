@@ -44,8 +44,9 @@ function BookingContent() {
   const L = lang === 'ar'
     ? { intro: 'اختر تواريخك وعدد المسافرين، ثم أكمل الحجز في محرك الحجز الآمن.', from: 'ابتداءً من' }
     : lang === 'en'
-    ? { intro: 'Choose your dates and guests, then complete your booking on our secure booking engine.', from: 'From' }
-    : { intro: 'Choisissez vos dates et vos voyageurs, puis finalisez votre réservation sur notre moteur de réservation sécurisé.', from: 'À partir de' };
+    ? { intro: 'Choose your dates and guests, then complete your booking on our secure booking engine.', from: 'From', byDates: 'Rate depends on your dates', exact: 'Exact price shown at the next step' }
+    : { intro: 'Choisissez vos dates et vos voyageurs, puis finalisez votre réservation sur notre moteur de réservation sécurisé.', from: 'À partir de', byDates: 'Tarif selon les dates', exact: 'Prix exact affiché à l’étape suivante' };
+  const num = (n: number) => n.toLocaleString(lang === 'en' ? 'en-GB' : 'fr-FR');
 
   return (
     <div className="min-h-screen bg-background" dir={dir}>
@@ -97,19 +98,19 @@ function BookingContent() {
                       <div>
                         {room.pricePerNight <= 0 ? (
                           <>
-                            <div className="text-sm text-muted-foreground">Tarif selon les dates</div>
-                            <div className="text-sm text-muted-foreground">Prix exact affiché à l’étape suivante</div>
+                            <div className="text-sm text-muted-foreground">{L.byDates}</div>
+                            <div className="text-sm text-muted-foreground">{L.exact}</div>
                           </>
                         ) : nights > 0 ? (
                           <>
-                            <span className="text-3xl font-bold text-accent">{(room.pricePerNight * nights).toLocaleString('fr-FR')}</span>
+                            <span className="text-3xl font-bold text-accent">{num(room.pricePerNight * nights)}</span>
                             <span className="text-muted-foreground"> {t.common.mad}</span>
-                            <div className="text-sm text-muted-foreground">{room.pricePerNight.toLocaleString('fr-FR')} {t.common.mad} × {nights} {t.booking.nights}</div>
+                            <div className="text-sm text-muted-foreground">{num(room.pricePerNight)} {t.common.mad} × {nights} {t.booking.nights}</div>
                           </>
                         ) : (
                           <>
                             <div className="text-sm text-muted-foreground">{L.from}</div>
-                            <span className="text-3xl font-bold text-accent">{room.pricePerNight.toLocaleString('fr-FR')}</span>
+                            <span className="text-3xl font-bold text-accent">{num(room.pricePerNight)}</span>
                             <span className="text-muted-foreground"> {t.common.mad}{t.rooms.perNight}</span>
                           </>
                         )}

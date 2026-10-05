@@ -1,7 +1,8 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Language, TRANSLATIONS, Room, Service, ContactInfo } from '@/lib/data';
 import { DEFAULT_CONTENT, loadContentRows, mergeContent } from '@/lib/content';
+import { DEFAULT_LANG, detectLang, isSiteLang, storeLang, withFallback } from '@/lib/lang';
 
 interface SiteContextType {
   lang: Language;
@@ -18,8 +19,8 @@ interface SiteContextType {
 const SiteContext = createContext<SiteContextType | null>(null);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
-  // Site en français uniquement.
-  const lang: Language = 'fr';
+  // Site bilingue FR / EN : français au premier affichage, puis langue du visiteur
+  const [lang, setLangState] = useState<Language>(DEFAULT_LANG);
   const [isDark, setIsDark] = useState(false);
   const [content, setContent] = useState(DEFAULT_CONTENT);
 
@@ -33,8 +34,8 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    setLangState(detectLang());
     const savedDark = localStorage.getItem('rds-dark');
-    document.documentElement.lang = 'fr';
     document.documentElement.dir = 'ltr';
     if (savedDark === 'true') {
       setIsDark(true);
@@ -42,7 +43,15 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setLang = useCallback((newLang: Language) => { void newLang; }, []);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const setLang = useCallback((newLang: Language) => {
+    if (!isSiteLang(newLang)) return;
+    setLangState(newLang);
+    storeLang(newLang);
+  }, []);
 
   const toggleDark = useCallback(() => {
     setIsDark(prev => {
@@ -58,10 +67,12 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const t = TRANSLATIONS[lang];
+  // Champs anglais laissés vides dans l'admin : le texte français s'affiche à la place
+  const shown = useMemo(() => withFallback(content), [content]);
   const dir: 'ltr' | 'rtl' = 'ltr';
 
   return (
-    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: content.rooms, services: content.services, contact: content.contact }}>
+    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: shown.rooms, services: shown.services, contact: shown.contact }}>
       {children}
     </SiteContext.Provider>
   );

@@ -4,13 +4,15 @@ import React from 'react';
 import { useSite } from '@/context/SiteContext';
 import { waDigits } from '@/lib/content';
 
-const WHATSAPP_MESSAGE = encodeURIComponent(
-  "Bonjour Riad Dar Soufa, je souhaite avoir plus d'informations."
-);
+const WHATSAPP_MESSAGE = {
+  fr: "Bonjour Riad Dar Soufa, je souhaite avoir plus d'informations.",
+  en: 'Hello Riad Dar Soufa, I would like more information.',
+};
 
 export default function WhatsAppFloat() {
-  const { dir, contact } = useSite();
-  const WHATSAPP_URL = `https://wa.me/${waDigits(contact.whatsapp)}?text=${WHATSAPP_MESSAGE}`;
+  const { dir, lang, contact } = useSite();
+  const message = lang === 'en' ? WHATSAPP_MESSAGE.en : WHATSAPP_MESSAGE.fr;
+  const WHATSAPP_URL = `https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(message)}`;
 
   return (
     <a
@@ -18,7 +20,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"
-      aria-label="Contacter Riad Dar Soufa sur WhatsApp"
+      aria-label={lang === 'en' ? 'Contact Riad Dar Soufa on WhatsApp' : 'Contacter Riad Dar Soufa sur WhatsApp'}
       style={
         dir === 'rtl'
           ? { right: 'auto', left: '2rem' }

@@ -25,8 +25,26 @@ interface FormErrors {
   message?: string;
 }
 
+const C = {
+  fr: {
+    required: '* Requis', badEmail: '* Email invalide', shortMsg: '* Message trop court (min. 10 caractères)',
+    select: '— Sélectionner —', reservation: 'Réservation', information: 'Demande d’information',
+    rates: 'Tarifs et disponibilités', event: 'Événement privé', other: 'Autre',
+    sentTitle: 'Message prêt dans WhatsApp', newMessage: 'Nouveau message', medina: 'Médina de Rabat',
+    placeholder: 'Écrivez votre message ici...',
+  },
+  en: {
+    required: '* Required', badEmail: '* Invalid email', shortMsg: '* Message too short (min. 10 characters)',
+    select: '— Select —', reservation: 'Booking', information: 'Information request',
+    rates: 'Rates and availability', event: 'Private event', other: 'Other',
+    sentTitle: 'Message ready in WhatsApp', newMessage: 'New message', medina: 'Rabat Medina',
+    placeholder: 'Write your message here...',
+  },
+};
+
 function ContactContent() {
   const { t, lang, dir, contact } = useSite();
+  const L = lang === 'en' ? C.en : C.fr;
   const [formData, setFormData] = useState<FormData>({
     nom: '', prenom: '', email: '', telephone: '', sujet: '', message: ''
   });
@@ -36,13 +54,13 @@ function ContactContent() {
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.nom.trim()) newErrors.nom = '* Requis';
-    if (!formData.prenom.trim()) newErrors.prenom = '* Requis';
+    if (!formData.nom.trim()) newErrors.nom = L.required;
+    if (!formData.prenom.trim()) newErrors.prenom = L.required;
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '* Email invalide';
+      newErrors.email = L.badEmail;
     }
     if (!formData.message.trim() || formData.message.trim().length < 10) {
-      newErrors.message = '* Message trop court (min. 10 caractères)';
+      newErrors.message = L.shortMsg;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -163,7 +181,7 @@ function ContactContent() {
                     <div className="bg-card/90 backdrop-blur-sm rounded-xl px-4 py-3 text-center shadow-lg border border-border">
                       <MapPinIcon className="h-6 w-6 mx-auto mb-1 text-accent" aria-hidden="true" />
                       <div className="font-semibold text-sm text-foreground">Riad Dar Soufa</div>
-                      <div className="text-xs text-muted-foreground">Médina de Rabat</div>
+                      <div className="text-xs text-muted-foreground">{L.medina}</div>
                     </div>
                   </div>
                 </div>
@@ -186,13 +204,13 @@ function ContactContent() {
                     <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                       <CheckIcon className="h-8 w-8 text-green-700 dark:text-green-400" aria-hidden="true" />
                     </div>
-                    <h3 className="font-serif text-2xl text-foreground">Message prêt dans WhatsApp</h3>
+                    <h3 className="font-serif text-2xl text-foreground">{L.sentTitle}</h3>
                     <p className="text-muted-foreground max-w-sm leading-relaxed">{t.contact.formSuccess}</p>
                     <button
                     onClick={() => {setSubmitted(false);setFormData({ nom: '', prenom: '', email: '', telephone: '', sujet: '', message: '' });}}
                     className="btn-primary mt-4">
                     
-                      Nouveau message
+                      {L.newMessage}
                     </button>
                   </div> :
 
@@ -278,12 +296,12 @@ function ContactContent() {
                       className="form-input"
                       aria-label={t.contact.formSubject}>
                       
-                        <option value="">— Sélectionner —</option>
-                        <option value="reservation">Réservation</option>
-                        <option value="information">Demande d&apos;information</option>
-                        <option value="tarifs">Tarifs et disponibilités</option>
-                        <option value="evenement">Événement privé</option>
-                        <option value="autre">Autre</option>
+                        <option value="">{L.select}</option>
+                        <option value="reservation">{L.reservation}</option>
+                        <option value="information">{L.information}</option>
+                        <option value="tarifs">{L.rates}</option>
+                        <option value="evenement">{L.event}</option>
+                        <option value="autre">{L.other}</option>
                       </select>
                     </div>
 
@@ -298,7 +316,7 @@ function ContactContent() {
                       onChange={handleChange}
                       rows={5}
                       className={`form-input resize-none ${errors.message ? 'border-red-400' : ''}`}
-                      placeholder={dir === 'rtl' ? 'اكتب رسالتك هنا...' : 'Écrivez votre message ici...'}
+                      placeholder={L.placeholder}
                       aria-label={t.contact.formMessage} />
                     
                       {errors.message && <p className="text-red-400 text-xs">{errors.message}</p>}

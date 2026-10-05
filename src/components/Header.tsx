@@ -6,6 +6,34 @@ import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
+/** Sélecteur de langue FR / EN */
+function LangSwitch({ light }: { light: boolean }) {
+  const { lang, setLang } = useSite();
+  return (
+    <div
+      role="group"
+      aria-label="Langue / Language"
+      className={`flex items-center rounded-full border p-0.5 ${light ? 'border-white/40' : 'border-border'}`}
+    >
+      {(['fr', 'en'] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          className={`rounded-full px-2.5 py-1 text-xs font-bold tracking-wider transition-colors duration-200 ${
+            lang === l
+              ? 'bg-accent text-white'
+              : light ? 'text-white/85 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Header() {
   const { t, isDark, toggleDark, dir } = useSite();
   const [scrolled, setScrolled] = useState(false);
@@ -59,6 +87,7 @@ export default function Header() {
 
           {/* Right Controls */}
           <div className={`hidden lg:flex items-center gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+            <LangSwitch light={overHero} />
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
@@ -76,6 +105,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center gap-2">
+            <LangSwitch light={overHero && !menuOpen} />
             <button
               onClick={toggleDark}
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-sm"

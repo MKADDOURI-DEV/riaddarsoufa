@@ -142,7 +142,7 @@ function RoomDetailContent() {
 
                 {/* WhatsApp */}
                 <a
-                  href={`https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par la ${room?.name?.fr}`)}`}
+                  href={`https://wa.me/${waDigits(contact.whatsapp)}?text=${encodeURIComponent(lang === 'en' ? `Hello, I am interested in the ${room?.name?.en || room?.name?.fr}` : `Bonjour, je suis intéressé(e) par la ${room?.name?.fr}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary w-full text-sm"
