@@ -4,6 +4,9 @@ import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { Room } from '@/lib/data';
 import { useSite } from '@/context/SiteContext';
+import { fromPrice, hasOccupancyPricing, formatMad } from '@/lib/pricing';
+import PriceNote from '@/components/PriceNote';
+import AmenityList from '@/components/AmenityList';
 import { UserIcon, Squares2X2Icon, HomeModernIcon } from '@heroicons/react/24/outline';
 
 interface RoomCardProps {
@@ -13,6 +16,8 @@ interface RoomCardProps {
 
 export default function RoomCard({ room, featured = false }: RoomCardProps) {
   const { t, lang, dir } = useSite();
+  const price = fromPrice(room);
+  const multi = hasOccupancyPricing(room);
 
   return (
     <div
@@ -50,15 +55,18 @@ export default function RoomCard({ room, featured = false }: RoomCardProps) {
       <div className="p-5 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-serif text-lg text-foreground leading-tight">{room.name[lang]}</h3>
-          {room.pricePerNight > 0 && (
+          {price > 0 && (
             <div className="text-right flex-shrink-0">
-              <span className="text-accent font-bold text-lg">{room.pricePerNight.toLocaleString('fr-FR')}</span>
+              {multi && <span className="block text-[11px] text-muted-foreground">{t.rooms.from}</span>}
+              <span className="text-accent font-bold text-lg">{formatMad(price, lang)}</span>
               <span className="text-muted-foreground text-xs"> {t.common.mad}{t.rooms.perNight}</span>
             </div>
           )}
         </div>
 
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{room.shortDesc[lang]}</p>
+        {price > 0 && <PriceNote />}
+        <AmenityList room={room} compact />
 
         {/* Meta */}
         <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1">

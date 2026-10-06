@@ -5,10 +5,15 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
+import RiadAdmin from './RiadAdmin';
+import { AMENITIES } from '@/lib/amenities';
+import { TAXES } from '@/lib/pricing';
+import type { OccupancyPrice } from '@/lib/data';
+import type { RiadContent } from '@/lib/riad';
 import { MultiImageField } from './ImageUpload';
 import { DEFAULT_CONTENT, ROOMS_KEY, SERVICES_KEY, wrapItems, SiteContent, StoredService, loadContentRows, mergeContent } from '@/lib/content';
 
-type Tab = 'rooms' | 'services' | 'contact' | 'guide' | 'accounts';
+type Tab = 'rooms' | 'riad' | 'services' | 'contact' | 'guide' | 'accounts';
 
 const ICON_CHOICES: { value: string; label: string }[] = [
   { value: 'SparklesIcon', label: 'Étoiles' }, { value: 'StarIcon', label: 'Étoile' },
@@ -126,7 +131,25 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
     pricePerNight: Number(r.pricePerNight) || 0,
     capacity: Number(r.capacity) || 1,
     size: Number(r.size) || 0,
+    occupancyPrices: (r.occupancyPrices || []).map((p) => ({ guests: Number(p.guests) || 1, price: Number(p.price) || 0 })),
+    amenityKeys: r.amenityKeys || [],
   }));
+
+  /** Lignes de tarifs par nombre de personnes : de 2 personnes à la capacité de la chambre. */
+  const occupancyRows = (capacity: number, current: OccupancyPrice[] = []): OccupancyPrice[] => {
+    const rows: OccupancyPrice[] = [];
+    for (let g = 2; g <= Math.max(2, Number(capacity) || 2); g++) {
+      rows.push({ guests: g, price: current.find((p) => p.guests === g)?.price ?? 0 });
+    }
+    return rows;
+  };
+  const toggleAmenity = (i: number, key: string) =>
+    setRooms((rs) => rs.map((r, idx) => {
+      if (idx !== i) return r;
+      const set = new Set(r.amenityKeys || []);
+      if (set.has(key)) set.delete(key); else set.add(key);
+      return { ...r, amenityKeys: AMENITIES.map((a) => a.key).filter((k) => set.has(k)) };
+    }));
 
   // La suppression est enregistrée immédiatement (plus besoin de cliquer ensuite sur « Enregistrer »).
   const remove = async (i: number) => {
@@ -145,7 +168,7 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
       shortDesc: { fr: '', en: '', ar: '' }, description: { fr: '', en: '', ar: '' },
       capacity: 2, bedType: { fr: 'Lit double', en: 'Lit double', ar: 'Lit double' },
       size: 0, pricePerNight: 0, images: rs[0]?.images?.slice(0, 1) ?? [],
-      amenities: rs[0]?.amenities ?? [], available: true,
+      amenities: [], amenityKeys: rs[0]?.amenityKeys ?? [], occupancyPrices: [], available: true,
     }]);
 
   const save = async () => {
@@ -163,7 +186,9 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
       {rooms.map((r, i) => (
         <details key={r.id} className="mb-4 rounded-xl border border-foreground/15 p-4" open={i === 0}>
           <summary className="cursor-pointer font-semibold text-foreground">
-            {i + 1}. {r.name.fr}{Number(r.pricePerNight) > 0 ? ` — ${Number(r.pricePerNight).toLocaleString('fr-FR')} MAD` : ''} {r.available ? '' : '(indisponible)'}
+            {i + 1}. {r.name.fr}{(r.occupancyPrices?.length ?? 0) > 0
+              ? ` — ${r.occupancyPrices!.map((p) => `${p.guests} pers. : ${Number(p.price) > 0 ? Number(p.price).toLocaleString('fr-FR') + ' MAD' : 'à saisir'}`).join(' · ')}`
+              : Number(r.pricePerNight) > 0 ? ` — ${Number(r.pricePerNight).toLocaleString('fr-FR')} MAD` : ''} {r.available ? '' : '(indisponible)'}
           </summary>
           <div className="mt-4">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -175,14 +200,59 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
             <TriField label="Description courte" value={r.shortDesc} onChange={(v) => update(i, { shortDesc: v })} />
             <TriField label="Description complète" multiline value={r.description} onChange={(v) => update(i, { description: v })} />
             <TriField label="Type de lit" value={r.bedType} onChange={(v) => update(i, { bedType: v })} />
+            <p className="mb-3 rounded-lg bg-foreground/5 px-3 py-2 text-xs text-foreground/70">
+              Saisissez des <b>tarifs finaux tout compris</b> : petit-déjeuner, TVA {TAXES.tvaPercent} %, taxe communale ({TAXES.communale} MAD/pers./nuit) et taxe de promotion touristique ({TAXES.promotion} MAD/pers./nuit). Le site affiche ce prix sans aucun supplément.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div><label className={labelCls}>Prix / nuit (MAD, 0 = non affiché)</label>
-                <input type="number" min={0} className={inputCls} value={r.pricePerNight} onChange={(e) => update(i, { pricePerNight: Number(e.target.value) })} /></div>
+              <div><label className={labelCls}>{(r.occupancyPrices?.length ?? 0) > 0 ? 'Prix / nuit (non utilisé : tarifs par personnes)' : 'Prix / nuit, 1 ou 2 pers. (MAD, 0 = non affiché)'}</label>
+                <input type="number" min={0} disabled={(r.occupancyPrices?.length ?? 0) > 0} className={`${inputCls} disabled:opacity-50`} value={r.pricePerNight} onChange={(e) => update(i, { pricePerNight: Number(e.target.value) })} /></div>
               <div><label className={labelCls}>Capacité (personnes)</label>
-                <input type="number" min={1} className={inputCls} value={r.capacity} onChange={(e) => update(i, { capacity: Number(e.target.value) })} /></div>
+                <input type="number" min={1} className={inputCls} value={r.capacity} onChange={(e) => {
+                  const capacity = Number(e.target.value);
+                  update(i, (r.occupancyPrices?.length ?? 0) > 0 ? { capacity, occupancyPrices: occupancyRows(capacity, r.occupancyPrices) } : { capacity });
+                }} /></div>
               <div><label className={labelCls}>Surface (m², 0 = non affichée)</label>
                 <input type="number" min={0} className={inputCls} value={r.size} onChange={(e) => update(i, { size: Number(e.target.value) })} /></div>
             </div>
+            {/* Tarifs selon le nombre de personnes (chambre Patio : 2, 3 et 4 personnes) */}
+            <div className="mb-4 rounded-xl border border-foreground/15 p-4">
+              <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <input type="checkbox" checked={(r.occupancyPrices?.length ?? 0) > 0}
+                  onChange={(e) => update(i, { occupancyPrices: e.target.checked ? occupancyRows(r.capacity, r.occupancyPrices) : [] })} />
+                Tarifs différents selon le nombre de personnes
+              </label>
+              {(r.occupancyPrices?.length ?? 0) > 0 && (
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {r.occupancyPrices!.map((p, k) => (
+                    <div key={p.guests}>
+                      <label className={labelCls}>{p.guests} personnes (MAD / nuit)</label>
+                      <input type="number" min={0} className={inputCls} value={p.price}
+                        onChange={(e) => update(i, { occupancyPrices: r.occupancyPrices!.map((x, j) => (j === k ? { ...x, price: Number(e.target.value) } : x)) })} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="mt-2 text-xs text-foreground/60">Le site affiche « À partir de » le plus petit tarif, et le détail par nombre de personnes sur la fiche de la chambre. Pensez à paramétrer les mêmes tarifs dans Nozoul.</p>
+            </div>
+
+            {/* Équipements avec icônes */}
+            <div className="mb-4">
+              <span className={labelCls}>Équipements (affichés avec une icône)</span>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {AMENITIES.map((a) => {
+                  const Icon = a.icon;
+                  const on = (r.amenityKeys || []).includes(a.key);
+                  return (
+                    <label key={a.key} className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm ${on ? 'border-primary bg-primary/5' : 'border-foreground/15'}`}>
+                      <input type="checkbox" checked={on} onChange={() => toggleAmenity(i, a.key)} />
+                      <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      {a.fr}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <label className="flex items-center gap-2 mb-4 text-sm text-foreground">
               <input type="checkbox" checked={r.available} onChange={(e) => update(i, { available: e.target.checked })} />
               Chambre disponible à la réservation
@@ -479,13 +549,26 @@ function Dashboard({ session }: { session: Session }) {
   useEffect(() => { reload(); }, [reload]);
 
   const saveKey = async (key: typeof ROOMS_KEY | typeof SERVICES_KEY | 'contact', value: unknown) => {
-    const stored = key === 'contact' ? value : wrapItems(value as unknown[]);
+    let stored = key === 'contact' ? value : wrapItems(value as unknown[]);
+    if (key === 'contact') {
+      // La ligne « contact » contient aussi la page « Le Riad » (champ riad) :
+      // on repart de la version en base pour ne jamais écraser l'autre partie.
+      const { data: cur } = await supabase.from('site_content').select('value').eq('key', 'contact').maybeSingle();
+      const base = cur?.value && typeof cur.value === 'object' ? cur.value as Record<string, unknown> : {};
+      stored = { ...base, ...(value as Record<string, unknown>) };
+    }
     const { error } = await supabase.from('site_content').upsert({ key, value: stored, updated_at: new Date().toISOString() });
     if (error) throw new Error(error.message);
+  };
+  /** Enregistre la page « Le Riad » dans la ligne « contact » (champ riad). */
+  const saveRiad = async (riad: RiadContent) => {
+    await saveKey('contact', { riad });
+    setContent((c) => (c ? { ...c, riad } : c));
   };
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'rooms', label: 'Chambres & prix' },
+    { id: 'riad', label: 'Le Riad' },
     { id: 'services', label: 'Services' },
     { id: 'contact', label: 'Contact' },
     { id: 'guide', label: 'Guide d’accueil' },
@@ -524,6 +607,7 @@ function Dashboard({ session }: { session: Session }) {
                 initial={content.services.map(({ id, name, description, available, icon, images }) => ({ id, name, description, available, icon, images: images || [] }))}
                 onSave={(v) => saveKey(SERVICES_KEY, v)} />
             )}
+            {tab === 'riad' && <RiadAdmin key="riad" initial={content.riad} onSave={saveRiad} />}
             {tab === 'guide' && <GuideAdmin key="g" />}
             {tab === 'accounts' && <AccountsEditor key="a" />}
             {tab === 'contact' && <ContactEditor key="c" initial={content.contact} onSave={(v) => saveKey('contact', v)} />}

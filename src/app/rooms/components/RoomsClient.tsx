@@ -7,6 +7,8 @@ import WhatsAppFloat from '@/components/WhatsAppFloat';
 import RoomCard from '@/components/RoomCard';
 import { useSite } from '@/context/SiteContext';
 import AppImage from '@/components/ui/AppImage';
+import PriceNote from '@/components/PriceNote';
+import { DirectRatesBadge } from '@/components/DirectRates';
 
 function RoomsContent() {
   const { t, lang, dir, rooms: ROOMS } = useSite();
@@ -66,6 +68,10 @@ function RoomsContent() {
 
         {/* Rooms Grid */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
+          <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-center">
+            <DirectRatesBadge className="justify-self-start" />
+            <PriceNote variant="full" />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {filtered.map((room) =>
             <RoomCard key={room.id} room={room} />

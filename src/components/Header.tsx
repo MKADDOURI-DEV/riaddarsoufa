@@ -49,6 +49,7 @@ export default function Header() {
 
   const navLinks = [
     { href: '/', label: t.nav.home },
+    { href: '/riad', label: t.nav.riad },
     { href: '/rooms', label: t.nav.rooms },
     { href: '/services', label: t.nav.services },
     { href: '/contact', label: t.nav.contact },
@@ -68,7 +69,9 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <AppLogo size={56} src={overHero ? '/assets/images/app_logo_light.png' : undefined} />
+            {/* Logo agrandi (hauteur 52 px sur mobile, 64 px sur ordinateur) */}
+            <AppLogo size={52} className="lg:hidden" src={overHero ? '/assets/images/app_logo_light.png' : undefined} />
+            <AppLogo size={64} className="hidden lg:flex" src={overHero ? '/assets/images/app_logo_light.png' : undefined} />
             <span className="sr-only">Riad Dar Soufa</span>
           </Link>
 

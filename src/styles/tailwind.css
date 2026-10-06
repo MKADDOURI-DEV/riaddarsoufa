@@ -3,42 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: #F6F1E7;
-  --foreground: #16231F;
-  --primary: #183B35;
+  /* Charte bleu ardoise (octobre 2026) */
+  --background: #F4F3EF;
+  --foreground: #1E2833;
+  --primary: #3F5368;
   --primary-foreground: #FFFFFF;
-  --secondary: #EAE2D0;
-  --secondary-foreground: #16231F;
-  --accent: #86652B;
+  --secondary: #E4E7EA;
+  --secondary-foreground: #1E2833;
+  --accent: #8A6D42;
   --accent-foreground: #FFFFFF;
-  --muted: #EBE4D3;
-  --muted-foreground: #656B62;
-  --card: #FCFAF5;
-  --card-foreground: #16231F;
-  --border: #DDD3BE;
-  --input: #DDD3BE;
-  --ring: #86652B;
+  --muted: #E9EAEC;
+  --muted-foreground: #5F6B78;
+  --card: #FBFBF9;
+  --card-foreground: #1E2833;
+  --border: #D6DADF;
+  --input: #D6DADF;
+  --ring: #3F5368;
   --radius: 0.5rem;
   --font-sans: var(--font-montserrat), 'Montserrat', Arial, sans-serif;
   --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
 }
 
 .dark {
-  --background: #0F1F1B;
-  --foreground: #F1EBDD;
-  --primary: #2F6B5F;
+  --background: #161D25;
+  --foreground: #ECEEF1;
+  --primary: #6E8AA6;
   --primary-foreground: #FFFFFF;
-  --secondary: #162B26;
-  --secondary-foreground: #F1EBDD;
-  --accent: #C9A15A;
-  --accent-foreground: #0F1F1B;
-  --muted: #162B26;
-  --muted-foreground: #A3AFA6;
-  --card: #132722;
-  --card-foreground: #F1EBDD;
-  --border: #25423B;
-  --input: #25423B;
-  --ring: #C9A15A;
+  --secondary: #1F2833;
+  --secondary-foreground: #ECEEF1;
+  --accent: #C9A86A;
+  --accent-foreground: #161D25;
+  --muted: #1F2833;
+  --muted-foreground: #9AA6B2;
+  --card: #1B232D;
+  --card-foreground: #ECEEF1;
+  --border: #2D3946;
+  --input: #2D3946;
+  --ring: #C9A86A;
 }
 
 @layer base {
@@ -224,7 +225,7 @@
   }
 
   .booking-bar-shadow {
-    box-shadow: 0 20px 60px -10px rgba(11, 74, 111, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 60px -10px rgba(63, 83, 104, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
   }
 
   .dark .booking-bar-shadow {
@@ -237,7 +238,7 @@
 
   .room-card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 50px -10px rgba(11, 74, 111, 0.2);
+    box-shadow: 0 20px 50px -10px rgba(63, 83, 104, 0.2);
   }
 
   .dark .room-card-hover:hover {
@@ -263,7 +264,7 @@
     background-color: var(--accent);
     color: var(--foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(31, 163, 154, 0.35);
+    box-shadow: 0 10px 30px rgba(63, 83, 104, 0.35);
   }
 
   .btn-secondary {
@@ -307,7 +308,7 @@
     background-color: var(--primary);
     color: var(--primary-foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(11, 74, 111, 0.3);
+    box-shadow: 0 10px 30px rgba(63, 83, 104, 0.3);
   }
 
   /* Scrollbar */
@@ -359,10 +360,18 @@
 
   .form-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(11, 74, 111, 0.1);
+    box-shadow: 0 0 0 3px rgba(63, 83, 104, 0.1);
   }
 
   .dark .form-input {
     background: var(--muted);
   }
+}
+/* Motif géométrique inspiré du zellige (page « Le Riad », sections sans photo) */
+.riad-pattern {
+  background-color: var(--secondary);
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 38%, color-mix(in srgb, var(--primary) 14%, transparent) 39%, color-mix(in srgb, var(--primary) 14%, transparent) 42%, transparent 43%),
+    conic-gradient(from 45deg at 50% 50%, color-mix(in srgb, var(--primary) 9%, transparent) 0 25%, transparent 0 50%, color-mix(in srgb, var(--primary) 9%, transparent) 0 75%, transparent 0);
+  background-size: 56px 56px, 28px 28px;
 }

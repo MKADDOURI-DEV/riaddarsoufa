@@ -17,7 +17,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <AppLogo size={72} src="/assets/images/app_logo_light.png" />
+              <AppLogo size={80} src="/assets/images/app_logo_light.png" />
               <span className="sr-only">Riad Dar Soufa</span>
             </div>
             <p className="text-sm text-primary-foreground/60 leading-relaxed max-w-xs">
@@ -60,6 +60,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { href: '/', label: t?.nav?.home },
+                { href: '/riad', label: t?.nav?.riad },
                 { href: '/rooms', label: t?.nav?.rooms },
                 { href: '/services', label: t?.nav?.services },
                 { href: '/contact', label: t?.nav?.contact },

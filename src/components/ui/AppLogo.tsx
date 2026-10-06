@@ -7,10 +7,13 @@ import AppImage from './AppImage';
 interface AppLogoProps {
   src?: string; // Image source (optional)
   iconName?: string; // Icon name when no image
-  size?: number; // Size for icon/image
+  size?: number; // Hauteur du logo (px) ; la largeur suit les proportions de l'image
   className?: string; // Additional classes
   onClick?: () => void; // Click handler
 }
+
+/** Proportions du logo (largeur / hauteur) après suppression des marges transparentes. */
+const LOGO_RATIO = 740 / 578;
 
 const AppLogo = memo(function AppLogo({
   src = '/assets/images/app_logo.png',
@@ -33,9 +36,10 @@ const AppLogo = memo(function AppLogo({
       {src ? (
         <AppImage
           src={src}
-          alt="Logo" 
-          width={size}
+          alt="Riad Dar Soufa"
+          width={Math.round(size * LOGO_RATIO)}
           height={size}
+          style={{ height: size, width: 'auto' }}
           className="flex-shrink-0"
           priority={true}
           unoptimized={src.endsWith('.svg')}

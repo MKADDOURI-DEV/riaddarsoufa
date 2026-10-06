@@ -12,8 +12,18 @@ export interface Room {
   pricePerNight: number;
   images: string[];
   amenities: { fr: string; en: string; ar: string }[];
+  /** Équipements affichés avec une icône (clés du catalogue, voir src/lib/amenities.ts). */
+  amenityKeys?: string[];
+  /** Tarifs selon le nombre de personnes (ex. chambre Patio : 2, 3 et 4 personnes). Vide = tarif unique. */
+  occupancyPrices?: OccupancyPrice[];
   available: boolean;
   tag?: { fr: string; en: string; ar: string };
+}
+
+export interface OccupancyPrice {
+  guests: number;
+  /** Tarif par nuit, tout compris (MAD). 0 = non renseigné. */
+  price: number;
 }
 
 export interface Service {
@@ -93,6 +103,7 @@ export const ROOMS: Room[] = [
     bedType: { fr: '4 personnes', en: '4 guests', ar: '4 personnes' },
     size: 0,
     pricePerNight: 0,
+    occupancyPrices: [{ guests: 2, price: 0 }, { guests: 3, price: 0 }, { guests: 4, price: 0 }],
     images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=1200&auto=format&fit=crop'],
     amenities: [],
     available: true,
@@ -244,6 +255,7 @@ export const TRANSLATIONS = {
   fr: {
     nav: {
       home: 'Accueil',
+      riad: 'Le Riad',
       rooms: 'Chambres',
       services: 'Services',
       contact: 'Contact',
@@ -300,6 +312,12 @@ export const TRANSLATIONS = {
       allRooms: 'Toutes nos chambres',
       gallery: 'Galerie',
       backToRooms: 'Retour aux chambres',
+      from: 'À partir de',
+      perNightFull: 'par nuit',
+      ratesByGuests: 'Tarifs selon le nombre de personnes',
+      guestsCount: (n: number) => `${n} personne${n > 1 ? 's' : ''}`,
+      onePerson: '1 ou 2 personnes',
+      byDates: 'Tarif selon les dates',
     },
     services: {
       title: 'Nos Services',
@@ -348,6 +366,7 @@ export const TRANSLATIONS = {
   en: {
     nav: {
       home: 'Home',
+      riad: 'The Riad',
       rooms: 'Rooms',
       services: 'Services',
       contact: 'Contact',
@@ -404,6 +423,12 @@ export const TRANSLATIONS = {
       allRooms: 'All our rooms',
       gallery: 'Gallery',
       backToRooms: 'Back to rooms',
+      from: 'From',
+      perNightFull: 'per night',
+      ratesByGuests: 'Rates by number of guests',
+      guestsCount: (n: number) => `${n} guest${n > 1 ? 's' : ''}`,
+      onePerson: '1 or 2 guests',
+      byDates: 'Rate depends on your dates',
     },
     services: {
       title: 'Our Services',
@@ -452,6 +477,7 @@ export const TRANSLATIONS = {
   ar: {
     nav: {
       home: 'الرئيسية',
+      riad: 'الرياض',
       rooms: 'الغرف',
       services: 'الخدمات',
       contact: 'اتصل بنا',
@@ -508,6 +534,12 @@ export const TRANSLATIONS = {
       allRooms: 'جميع غرفنا',
       gallery: 'معرض الصور',
       backToRooms: 'العودة إلى الغرف',
+      from: 'ابتداءً من',
+      perNightFull: 'لليلة',
+      ratesByGuests: 'Rates by number of guests',
+      guestsCount: (n: number) => `${n} guest${n > 1 ? 's' : ''}`,
+      onePerson: '1 or 2 guests',
+      byDates: 'Rate depends on your dates',
     },
     services: {
       title: 'خدماتنا',

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Language, TRANSLATIONS, Room, Service, ContactInfo } from '@/lib/data';
 import { DEFAULT_CONTENT, loadContentRows, mergeContent } from '@/lib/content';
+import type { RiadContent } from '@/lib/riad';
 import { DEFAULT_LANG, detectLang, isSiteLang, storeLang, withFallback } from '@/lib/lang';
 
 interface SiteContextType {
@@ -14,6 +15,7 @@ interface SiteContextType {
   rooms: Room[];
   services: Service[];
   contact: ContactInfo;
+  riad: RiadContent;
 }
 
 const SiteContext = createContext<SiteContextType | null>(null);
@@ -72,7 +74,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   const dir: 'ltr' | 'rtl' = 'ltr';
 
   return (
-    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: shown.rooms, services: shown.services, contact: shown.contact }}>
+    <SiteContext.Provider value={{ lang, setLang, t, isDark, toggleDark, dir, rooms: shown.rooms, services: shown.services, contact: shown.contact, riad: shown.riad }}>
       {children}
     </SiteContext.Provider>
   );
