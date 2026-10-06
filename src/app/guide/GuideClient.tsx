@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  ClockIcon, WifiIcon, SparklesIcon, MapPinIcon, TruckIcon, ChatBubbleLeftRightIcon,
+  ClockIcon, WifiIcon, SparklesIcon, MapPinIcon, TruckIcon, ChatBubbleLeftRightIcon, XMarkIcon,
 } from '@heroicons/react/24/outline';
 import AppLogo from '@/components/ui/AppLogo';
 import { ROOMS } from '@/lib/data';
@@ -48,37 +48,91 @@ function SectionTitle({ icon: Icon, children, id }: { icon: IconCmp; children: R
 }
 
 /** Carte du guide : photo d'un côté, détails de l'autre (même principe que les cartes de réservation).
- *  Sans photo (ou photo introuvable), un visuel de remplacement garde la mise en page moitié / moitié. */
+ *  Sans photo (ou photo introuvable), un visuel de remplacement garde la mise en page moitié / moitié.
+ *  Un appui sur la carte ouvre une grande fiche (≈ 85 % de l'écran) avec la photo en grand et tous les détails. */
 function SplitCard({
-  image, alt, title, badge, children, footer, placeholder: Placeholder,
-}: { image?: string; alt: string; title: string; badge?: string; children?: React.ReactNode; footer?: React.ReactNode; placeholder: IconCmp }) {
+  image, alt, title, badge, children, footer, details, placeholder: Placeholder,
+}: { image?: string; alt: string; title: string; badge?: string; children?: React.ReactNode; footer?: React.ReactNode; details?: React.ReactNode; placeholder: IconCmp }) {
   const [broken, setBroken] = useState(false);
+  const [open, setOpen] = useState(false);
   const showImg = !!image && !broken;
+
+  // Fiche ouverte : Échap pour fermer, le fond de page ne défile plus
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
+  }, [open]);
+
   return (
-    <article className="overflow-hidden rounded-[24px] border border-border bg-card">
-      <div className="grid grid-cols-2 sm:grid-cols-[2fr_3fr]">
-        <div className="relative min-h-[200px] bg-[color-mix(in_srgb,var(--accent)_12%,var(--card))]">
-          {showImg ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} alt={alt} loading="lazy" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Placeholder className="h-10 w-10 text-accent/60" aria-hidden="true" />
-            </div>
-          )}
-        </div>
-        <div className="flex min-w-0 flex-col p-4 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <h3 className="font-serif text-lg leading-snug text-foreground sm:text-2xl">{title}</h3>
-            {badge && (
-              <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-2.5 py-1 text-xs font-semibold text-accent sm:px-3 sm:text-sm">{badge}</span>
+    <>
+      <article
+        role="button" tabIndex={0} aria-haspopup="dialog"
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); } }}
+        className="cursor-pointer overflow-hidden rounded-[24px] border border-border bg-card transition active:scale-[0.99]"
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-[2fr_3fr]">
+          <div className="relative min-h-[200px] bg-[color-mix(in_srgb,var(--accent)_12%,var(--card))]">
+            {showImg ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={image} alt={alt} loading="lazy" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Placeholder className="h-10 w-10 text-accent/60" aria-hidden="true" />
+              </div>
             )}
           </div>
-          {children}
-          {footer && <div className="mt-auto pt-4"><div className="border-t border-border pt-3 sm:pt-4">{footer}</div></div>}
+          <div className="flex min-w-0 flex-col p-4 sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <h3 className="font-serif text-lg leading-snug text-foreground sm:text-2xl">{title}</h3>
+              {badge && (
+                <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-2.5 py-1 text-xs font-semibold text-accent sm:px-3 sm:text-sm">{badge}</span>
+              )}
+            </div>
+            {children}
+            {footer && <div className="mt-auto pt-4" onClick={(e) => e.stopPropagation()}><div className="border-t border-border pt-3 sm:pt-4">{footer}</div></div>}
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={title}>
+          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+          <div className="relative flex h-[85dvh] w-full flex-col overflow-hidden rounded-t-[28px] border border-border bg-card shadow-2xl sm:h-[85vh] sm:max-w-2xl sm:rounded-[28px]">
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close"
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur active:scale-95">
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="relative aspect-[4/3] w-full bg-[color-mix(in_srgb,var(--accent)_12%,var(--card))]">
+                {showImg ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={image} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Placeholder className="h-14 w-14 text-accent/60" aria-hidden="true" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4 p-5 sm:p-7">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <h3 className="font-serif text-2xl leading-snug text-foreground sm:text-3xl">{title}</h3>
+                  {badge && (
+                    <span className="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-3 py-1 text-sm font-semibold text-accent">{badge}</span>
+                  )}
+                </div>
+                {details ?? children}
+                {footer && <div className="border-t border-border pt-4">{footer}</div>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -260,7 +314,11 @@ export default function GuideClient() {
                         <span className="text-sm text-muted-foreground"> {t.currency}</span>
                         {note && <p className="text-xs text-muted-foreground">{note}</p>}
                       </div>
-                    ) : undefined}>
+                    ) : undefined}
+                    details={<>
+                      {desc && <p className="whitespace-pre-line text-base leading-relaxed text-muted-foreground">{desc}</p>}
+                      {!hasPrice && note && <p className="text-sm text-muted-foreground">{note}</p>}
+                    </>}>
                     {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{desc}</p>}
                     {!hasPrice && note && <p className="mt-1 text-xs text-muted-foreground">{note}</p>}
                   </SplitCard>
@@ -281,7 +339,11 @@ export default function GuideClient() {
                 const desc = pick(p.description_fr, p.description_en, lang);
                 return (
                   <SplitCard key={p.id} image={p.image_url || examplePlacePhoto(p.name_fr || p.name_en, p.category_fr || p.category_en, idx)} alt={name} title={name} badge={cat || undefined} placeholder={MapPinIcon}
-                    footer={<MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />}>
+                    footer={<MapsButton href={mapsLink(p.maps_url, `${name} Rabat`)} label={t.maps} />}
+                    details={<>
+                      {desc && <p className="whitespace-pre-line text-base leading-relaxed text-muted-foreground">{desc}</p>}
+                      {p.address && <p className="text-sm text-foreground">{p.address}</p>}
+                    </>}>
                     {desc && <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">{desc}</p>}
                     {p.address && <p className="mt-2 text-xs text-muted-foreground">{p.address}</p>}
                   </SplitCard>
