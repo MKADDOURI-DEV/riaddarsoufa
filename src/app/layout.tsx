@@ -1,23 +1,11 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Montserrat, Cormorant_Garamond } from 'next/font/google';
 import '../styles/tailwind.css';
 
 // Typographie inspirée de Dar Amastan : titres en Cormorant Garamond, texte en Montserrat.
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-});
+// Chargées via <link> (et non next/font/google) pour ne pas dépendre du réseau pendant le build.
+const FONTS_URL =
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -44,8 +32,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${montserrat.variable} ${cormorant.variable}`}>
-      <body className={montserrat.className}>
+    <html lang="fr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link rel="stylesheet" href={FONTS_URL} />
+      </head>
+      <body style={{ fontFamily: "var(--font-sans)" }}>
         {children}
 
         <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Friaddarsou4308back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.20" />

@@ -20,8 +20,8 @@
   --input: #D6DADF;
   --ring: #3F5368;
   --radius: 0.5rem;
-  --font-sans: var(--font-montserrat), 'Montserrat', Arial, sans-serif;
-  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Montserrat', Arial, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
 }
 
 .dark {
