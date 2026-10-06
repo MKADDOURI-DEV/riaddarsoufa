@@ -9,6 +9,9 @@ import WhatsAppFloat from '@/components/WhatsAppFloat';
 import AppImage from '@/components/ui/AppImage';
 import BookingBar, { goToNozoul, useBookingForm } from '@/components/BookingBar';
 import { nightsBetween } from '@/lib/nozoul';
+import { fromPrice, priceForGuests, hasOccupancyPricing } from '@/lib/pricing';
+import PriceNote from '@/components/PriceNote';
+import AmenityList from '@/components/AmenityList';
 
 function BookingContent() {
   const { t, lang, dir, rooms: ROOMS } = useSite();
@@ -33,6 +36,7 @@ function BookingContent() {
   }, [searchParams, setForm]);
 
   const nights = nightsBetween(form.checkIn, form.checkOut);
+  const guests = (form.adults || 0) + (form.children || 0);
   const available = ROOMS.filter((r) => r.available);
   // La chambre choisie depuis sa fiche apparaît en premier
   const list = roomSlug ? [...available].sort((a, b) => (a.slug === roomSlug ? -1 : b.slug === roomSlug ? 1 : 0)) : available;
@@ -42,10 +46,10 @@ function BookingContent() {
   };
 
   const L = lang === 'ar'
-    ? { intro: 'اختر تواريخك وعدد المسافرين، ثم أكمل الحجز في محرك الحجز الآمن.', from: 'ابتداءً من' }
+    ? { intro: 'اختر تواريخك وعدد المسافرين، ثم أكمل الحجز في محرك الحجز الآمن.', from: 'ابتداءً من', allIn: 'Breakfast, VAT and taxes included', byDates: 'Rate depends on your dates', exact: 'Exact price shown at the next step' }
     : lang === 'en'
-    ? { intro: 'Choose your dates and guests, then complete your booking on our secure booking engine.', from: 'From', byDates: 'Rate depends on your dates', exact: 'Exact price shown at the next step' }
-    : { intro: 'Choisissez vos dates et vos voyageurs, puis finalisez votre réservation sur notre moteur de réservation sécurisé.', from: 'À partir de', byDates: 'Tarif selon les dates', exact: 'Prix exact affiché à l’étape suivante' };
+    ? { intro: 'Choose your dates and guests, then complete your booking on our secure booking engine.', from: 'From', allIn: 'Breakfast, VAT and taxes included', byDates: 'Rate depends on your dates', exact: 'Exact price shown at the next step' }
+    : { intro: 'Choisissez vos dates et vos voyageurs, puis finalisez votre réservation sur notre moteur de réservation sécurisé.', from: 'À partir de', allIn: 'Petit-déjeuner, TVA et taxes inclus', byDates: 'Tarif selon les dates', exact: 'Prix exact affiché à l’étape suivante' };
   const num = (n: number) => n.toLocaleString(lang === 'en' ? 'en-GB' : 'fr-FR');
 
   return (
@@ -65,8 +69,14 @@ function BookingContent() {
             <BookingBar state={booking} />
           </div>
 
+          <PriceNote variant="full" />
+
           <div className="space-y-6">
-            {list.map((room) => (
+            {list.map((room) => {
+              // Prix tout compris : selon le nombre de voyageurs pour les chambres à plusieurs tarifs (Patio)
+              const unit = priceForGuests(room, guests);
+              const multi = hasOccupancyPricing(room);
+              return (
               <article key={room.id}
                 className={`overflow-hidden rounded-[28px] border bg-card transition-colors ${room.slug === roomSlug ? 'border-accent' : 'border-border hover:border-accent'}`}>
                 <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
@@ -88,29 +98,26 @@ function BookingContent() {
                         <span className="inline-flex items-center gap-1.5"><HomeModernIcon className="h-4 w-4" aria-hidden="true" />{room.bedType[lang]}</span>
                         {room.size > 0 && <span className="inline-flex items-center gap-1.5"><Squares2X2Icon className="h-4 w-4" aria-hidden="true" />{room.size} {t.rooms.sqm}</span>}
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {room.amenities.slice(0, 4).map((a, i) => (
-                          <span key={i} className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">{a[lang]}</span>
-                        ))}
-                      </div>
+                      <AmenityList room={room} compact max={8} />
                     </div>
                     <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-border pt-5">
                       <div>
-                        {room.pricePerNight <= 0 ? (
+                        {fromPrice(room) <= 0 ? (
                           <>
                             <div className="text-sm text-muted-foreground">{L.byDates}</div>
                             <div className="text-sm text-muted-foreground">{L.exact}</div>
                           </>
                         ) : nights > 0 ? (
                           <>
-                            <span className="text-3xl font-bold text-accent">{num(room.pricePerNight * nights)}</span>
+                            <span className="text-3xl font-bold text-accent">{num(unit * nights)}</span>
                             <span className="text-muted-foreground"> {t.common.mad}</span>
-                            <div className="text-sm text-muted-foreground">{num(room.pricePerNight)} {t.common.mad} × {nights} {t.booking.nights}</div>
+                            <div className="text-sm text-muted-foreground">{num(unit)} {t.common.mad} × {nights} {t.booking.nights}{multi ? ` · ${t.rooms.guestsCount(guests)}` : ''}</div>
+                            <div className="text-xs text-muted-foreground">{L.allIn}</div>
                           </>
                         ) : (
                           <>
                             <div className="text-sm text-muted-foreground">{L.from}</div>
-                            <span className="text-3xl font-bold text-accent">{num(room.pricePerNight)}</span>
+                            <span className="text-3xl font-bold text-accent">{num(fromPrice(room))}</span>
                             <span className="text-muted-foreground"> {t.common.mad}{t.rooms.perNight}</span>
                           </>
                         )}
@@ -120,7 +127,8 @@ function BookingContent() {
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
             {list.length === 0 && <p className="text-muted-foreground text-center py-12">{t.booking.noResults}</p>}
           </div>
         </div>

@@ -3,42 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --background: #F6F1E7;
-  --foreground: #16231F;
-  --primary: #183B35;
+  /* Palette bleue (photo du client, octobre 2026) : #C3CADD #A5B2C3 #587AA3 #4A5D7C */
+  --background: #F2F4F9;
+  --foreground: #1D2738;
+  --primary: #4A5D7C;
   --primary-foreground: #FFFFFF;
-  --secondary: #EAE2D0;
-  --secondary-foreground: #16231F;
-  --accent: #86652B;
+  --secondary: #E3E8F1;
+  --secondary-foreground: #1D2738;
+  --accent: #587AA3;
   --accent-foreground: #FFFFFF;
-  --muted: #EBE4D3;
-  --muted-foreground: #656B62;
-  --card: #FCFAF5;
-  --card-foreground: #16231F;
-  --border: #DDD3BE;
-  --input: #DDD3BE;
-  --ring: #86652B;
+  --muted: #E6EAF2;
+  --muted-foreground: #556077;
+  --card: #FAFBFD;
+  --card-foreground: #1D2738;
+  --border: #C3CADD;
+  --input: #C3CADD;
+  --ring: #587AA3;
+  --footer: #4A5D7C;
+  --frame: #587AA3;
   --radius: 0.5rem;
   --font-sans: var(--font-montserrat), 'Montserrat', Arial, sans-serif;
   --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
 }
 
 .dark {
-  --background: #0F1F1B;
-  --foreground: #F1EBDD;
-  --primary: #2F6B5F;
+  --background: #131A27;
+  --foreground: #E8ECF4;
+  --primary: #587AA3;
   --primary-foreground: #FFFFFF;
-  --secondary: #162B26;
-  --secondary-foreground: #F1EBDD;
-  --accent: #C9A15A;
-  --accent-foreground: #0F1F1B;
-  --muted: #162B26;
-  --muted-foreground: #A3AFA6;
-  --card: #132722;
-  --card-foreground: #F1EBDD;
-  --border: #25423B;
-  --input: #25423B;
-  --ring: #C9A15A;
+  --secondary: #1B2536;
+  --secondary-foreground: #E8ECF4;
+  --accent: #A5B2C3;
+  --accent-foreground: #131A27;
+  --muted: #1B2536;
+  --muted-foreground: #A5B2C3;
+  --card: #182131;
+  --card-foreground: #E8ECF4;
+  --border: #2C3A52;
+  --input: #2C3A52;
+  --ring: #A5B2C3;
+  --footer: #2B3850;
+  --frame: #587AA3;
 }
 
 @layer base {
@@ -107,7 +112,11 @@
     transform: translateX(0);
   }
 
+  /* Cadre bleu simple et épais autour des photos */
+  .photo-frame,
   .img-hover {
+    border: 6px solid var(--frame);
+    background: var(--card);
     overflow: hidden;
   }
 
@@ -224,7 +233,7 @@
   }
 
   .booking-bar-shadow {
-    box-shadow: 0 20px 60px -10px rgba(11, 74, 111, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 60px -10px rgba(74, 93, 124, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
   }
 
   .dark .booking-bar-shadow {
@@ -237,7 +246,7 @@
 
   .room-card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 50px -10px rgba(11, 74, 111, 0.2);
+    box-shadow: 0 20px 50px -10px rgba(74, 93, 124, 0.2);
   }
 
   .dark .room-card-hover:hover {
@@ -263,7 +272,7 @@
     background-color: var(--accent);
     color: var(--foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(31, 163, 154, 0.35);
+    box-shadow: 0 10px 30px rgba(74, 93, 124, 0.35);
   }
 
   .btn-secondary {
@@ -307,7 +316,7 @@
     background-color: var(--primary);
     color: var(--primary-foreground);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(11, 74, 111, 0.3);
+    box-shadow: 0 10px 30px rgba(74, 93, 124, 0.3);
   }
 
   /* Scrollbar */
@@ -359,10 +368,18 @@
 
   .form-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(11, 74, 111, 0.1);
+    box-shadow: 0 0 0 3px rgba(74, 93, 124, 0.1);
   }
 
   .dark .form-input {
     background: var(--muted);
   }
+}
+/* Motif géométrique inspiré du zellige (page « Le Riad », sections sans photo) */
+.riad-pattern {
+  background-color: var(--secondary);
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 38%, color-mix(in srgb, var(--primary) 14%, transparent) 39%, color-mix(in srgb, var(--primary) 14%, transparent) 42%, transparent 43%),
+    conic-gradient(from 45deg at 50% 50%, color-mix(in srgb, var(--primary) 9%, transparent) 0 25%, transparent 0 50%, color-mix(in srgb, var(--primary) 9%, transparent) 0 75%, transparent 0);
+  background-size: 56px 56px, 28px 28px;
 }

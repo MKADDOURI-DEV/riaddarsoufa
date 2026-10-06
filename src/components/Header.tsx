@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { useSite } from '@/context/SiteContext';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
+import SocialIcons from '@/components/SocialIcons';
 
 /** Sélecteur de langue FR / EN */
 function LangSwitch({ light }: { light: boolean }) {
@@ -39,6 +40,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const overHero = pathname === '/' && !scrolled;
+  // Logo blanc sur la photo ; logo noir dès que le fond devient clair (au défilement) ; blanc en mode sombre
+  const logoSrc = overHero || isDark ? '/assets/images/app_logo_light.png' : '/assets/images/app_logo.png';
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export default function Header() {
 
   const navLinks = [
     { href: '/', label: t.nav.home },
+    { href: '/riad', label: t.nav.riad },
     { href: '/rooms', label: t.nav.rooms },
     { href: '/services', label: t.nav.services },
     { href: '/contact', label: t.nav.contact },
@@ -68,9 +72,14 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <AppLogo size={56} src={overHero ? '/assets/images/app_logo_light.png' : undefined} />
+            {/* Logo agrandi (hauteur 52 px sur mobile, 64 px sur ordinateur) */}
+            <AppLogo size={52} className="lg:hidden" src={logoSrc} />
+            <AppLogo size={64} className="hidden lg:flex" src={logoSrc} />
             <span className="sr-only">Riad Dar Soufa</span>
           </Link>
+
+          {/* Réseaux sociaux : visibles dès le haut de page, à côté du logo */}
+          <SocialIcons tone={overHero ? 'light' : 'dark'} size={30} className="ml-2 mr-auto gap-1.5 sm:ml-3 lg:ml-5 lg:gap-2" />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">

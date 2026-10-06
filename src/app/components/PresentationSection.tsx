@@ -6,7 +6,11 @@ import { useSite } from '@/context/SiteContext';
 import SectionLabel from '@/components/SectionLabel';
 
 export default function PresentationSection() {
-  const { t, dir, lang, contact } = useSite();
+  const { t, dir, lang, contact, riad } = useSite();
+  const L = lang === 'en' ? 'en' : 'fr';
+  const title = riad.intro.title[L] || riad.intro.title.fr;
+  const text = riad.intro.text[L] || riad.intro.text.fr;
+  const photo = riad.intro.image || 'https://img.rocket.new/generatedImages/rocket_gen_img_1f01e49fd-1772210725810.png';
 
   return (
     <section dir={dir} className="section-padding px-4 sm:px-6 lg:px-8 bg-secondary/30">
@@ -16,7 +20,7 @@ export default function PresentationSection() {
           <div className="relative">
             <div className="img-hover rounded-2xl overflow-hidden aspect-[4/3] relative">
               <AppImage
-                src="https://img.rocket.new/generatedImages/rocket_gen_img_1f01e49fd-1772210725810.png"
+                src={photo}
                 alt="Patio central du Riad Dar Soufa avec fontaine en zellige, orangers et architecture marocaine traditionnelle, lumière naturelle douce"
                 fill
                 className="object-cover"
@@ -35,13 +39,12 @@ export default function PresentationSection() {
             <div>
               <SectionLabel number="01">{t?.presentation?.label}</SectionLabel>
               <h2 className="font-serif text-display text-foreground mt-3 leading-tight">
-                {t?.presentation?.title}
+                {title}
               </h2>
             </div>
 
             <div className="space-y-4">
-              <p className="text-muted-foreground leading-relaxed">{t?.presentation?.text1}</p>
-              <p className="text-muted-foreground leading-relaxed">{t?.presentation?.text2}</p>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{text}</p>
             </div>
 
             {/* Stats */}
@@ -58,7 +61,7 @@ export default function PresentationSection() {
               )}
             </div>
 
-            <Link href="/rooms" className="btn-primary inline-flex">
+            <Link href="/riad" className="btn-primary inline-flex">
               {t?.presentation?.cta}
               <span className="ml-2">→</span>
             </Link>

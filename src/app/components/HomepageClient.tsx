@@ -8,6 +8,7 @@ import HeroSection from './HeroSection';
 import PresentationSection from './PresentationSection';
 import RoomsPreviewSection from './RoomsPreviewSection';
 import TestimonialsSection from './TestimonialsSection';
+import DirectRates from '@/components/DirectRates';
 
 export default function HomepageClient() {
   return (
@@ -16,6 +17,7 @@ export default function HomepageClient() {
         <Header />
         <main>
           <HeroSection />
+          <DirectRates />
           <PresentationSection />
           <RoomsPreviewSection />
           <TestimonialsSection />

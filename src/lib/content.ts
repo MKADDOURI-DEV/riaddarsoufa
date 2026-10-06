@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { ROOMS, SERVICES, SITE_CONFIG, Room, Service, ContactInfo } from '@/lib/data';
 import { exampleServicePhoto } from '@/lib/guide';
+import { DEFAULT_RIAD, RiadContent, mergeRiad } from '@/lib/riad';
+import { DEFAULT_HOME, HomeContent, mergeHome } from '@/lib/home';
 
 export const DEFAULT_CONTACT: ContactInfo = {
   address: SITE_CONFIG.address,
@@ -39,6 +41,10 @@ export interface SiteContent {
   rooms: Room[];
   services: Service[];
   contact: ContactInfo;
+  /** Page « Le Riad » (enregistrée dans la ligne « contact », champ riad) */
+  riad: RiadContent;
+  /** Textes de l'accueil (enregistrés dans la ligne « contact », champ home) */
+  home: HomeContent;
 }
 
 /** Photos de départ d'un service : photo d'exemple tant que l'admin n'a jamais enregistré de photos pour lui.
@@ -53,6 +59,8 @@ export const DEFAULT_CONTENT: SiteContent = {
   rooms: ROOMS,
   services: SERVICES.map((s, i) => ({ ...s, images: startPhotos(s.images, undefined, s.name.fr, i) })),
   contact: DEFAULT_CONTACT,
+  riad: DEFAULT_RIAD,
+  home: DEFAULT_HOME,
 };
 
 type Tri = { fr: string; en: string; ar: string };
@@ -91,6 +99,8 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
     rooms: DEFAULT_CONTENT.rooms,
     services: DEFAULT_CONTENT.services,
     contact: DEFAULT_CONTENT.contact,
+    riad: DEFAULT_CONTENT.riad,
+    home: DEFAULT_CONTENT.home,
   };
   if (!rows) return result;
 
@@ -114,7 +124,9 @@ export function mergeContent(rows: { key: string; value: unknown }[] | null): Si
       });
     }
     if (row.key === 'contact' && row.value && typeof row.value === 'object') {
-      const c = row.value as Partial<ContactInfo>;
+      const { riad, home, ...c } = row.value as Partial<ContactInfo> & { riad?: unknown; home?: unknown };
+      result.riad = mergeRiad(riad);
+      result.home = mergeHome(home);
       result.contact = {
         ...DEFAULT_CONTENT.contact,
         ...c,
