@@ -66,7 +66,7 @@ export default function RoomCard({ room, featured = false }: RoomCardProps) {
 
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{room.shortDesc[lang]}</p>
         {price > 0 && <PriceNote />}
-        <AmenityList room={room} compact />
+        <AmenityList room={room} compact labels />
 
         {/* Meta */}
         <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1">

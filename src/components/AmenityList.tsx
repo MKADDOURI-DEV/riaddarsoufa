@@ -11,7 +11,7 @@ import { CheckIcon } from '@heroicons/react/24/outline';
  * - sinon  : grille icône + libellé (fiche chambre)
  * Les anciens équipements saisis en texte libre restent affichés (coche).
  */
-export default function AmenityList({ room, compact = false, max = 6 }: { room: Room; compact?: boolean; max?: number }) {
+export default function AmenityList({ room, compact = false, max = 6, labels = false }: { room: Room; compact?: boolean; max?: number; labels?: boolean }) {
   const { lang } = useSite();
   const items = roomAmenities(room.amenityKeys);
   const legacy = room.amenities || [];
@@ -27,9 +27,11 @@ export default function AmenityList({ room, compact = false, max = 6 }: { room: 
           const Icon = a.icon;
           return (
             <li key={a.key} title={label(a)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-primary">
-              <Icon className="h-4 w-4" aria-hidden="true" strokeWidth={1.6} />
-              <span className="sr-only">{label(a)}</span>
+              className={labels
+                ? 'flex items-center gap-1.5 rounded-full bg-muted py-1 pl-2 pr-3 text-xs font-medium text-foreground'
+                : 'flex h-8 w-8 items-center justify-center rounded-full bg-muted text-primary'}>
+              <Icon className={labels ? 'h-3.5 w-3.5 shrink-0 text-primary' : 'h-4 w-4'} aria-hidden="true" strokeWidth={1.6} />
+              <span className={labels ? '' : 'sr-only'}>{label(a)}</span>
             </li>
           );
         })}

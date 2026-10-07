@@ -65,7 +65,7 @@ export default function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         overHero
           ? 'bg-transparent'
-          : 'bg-card/95 backdrop-blur-md shadow-sm border-b border-border'
+          : 'bg-background/95 backdrop-blur-md shadow-sm border-b border-border'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,7 +87,14 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-underline text-sm font-medium transition-colors duration-300 pb-0.5 ${overHero ? 'text-white/85 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
+                aria-current={pathname === link.href ? 'page' : undefined}
+                className={`nav-underline text-sm font-semibold transition-colors duration-300 pb-0.5 ${
+                  overHero
+                    ? 'text-white hover:text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.55)]'
+                    : pathname === link.href
+                      ? 'text-primary border-b-2 border-accent'
+                      : 'text-foreground/85 hover:text-primary'
+                }`}
               >
                 {link.label}
               </Link>
@@ -140,7 +147,7 @@ export default function Header() {
       <div
         className={`lg:hidden transition-all duration-300 overflow-hidden ${
           menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        } bg-card/98 backdrop-blur-md border-t border-border`}
+        } bg-background backdrop-blur-md border-t border-border`}
       >
         <div className="px-4 py-6 space-y-4">
           {navLinks.map(link => (
@@ -148,7 +155,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block text-base font-medium text-foreground hover:text-accent transition-colors py-2 border-b border-border last:border-0"
+              className={`block text-base font-semibold hover:text-accent transition-colors py-2 border-b border-border last:border-0 ${pathname === link.href ? 'text-primary' : 'text-foreground'}`}
             >
               {link.label}
             </Link>
