@@ -83,6 +83,8 @@ function upgradeItem<T extends { id: string }>(item: T, defaults: { id: string }
   const def = defaults.find((d) => d.id === item.id) as Record<string, unknown> | undefined;
   if (!def) return item;
   const out: Record<string, unknown> = { ...item };
+  // Chambre enregistrée avant les tarifs par personnes (Patio) : reprendre les lignes 2 / 3 / 4 personnes par défaut
+  if (!('occupancyPrices' in item) && Array.isArray(def.occupancyPrices)) out.occupancyPrices = def.occupancyPrices;
   for (const [k, v] of Object.entries(item)) {
     if (Array.isArray(v) && Array.isArray(def[k])) {
       out[k] = v.map((x, i) => upgradeTri(x, (def[k] as unknown[])[i]));

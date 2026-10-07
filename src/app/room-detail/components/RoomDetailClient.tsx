@@ -24,6 +24,8 @@ function RoomDetailContent() {
   const [activeImage, setActiveImage] = useState(0);
   const price = room ? fromPrice(room) : 0;
   const occ = room ? filledOccupancyPrices(room) : [];
+  // Toutes les lignes de tarif (2 / 3 / 4 pers.) : une ligne sans prix s'affiche « Sur demande »
+  const occRows = (room?.occupancyPrices || []).filter((p) => Number(p.guests) > 0).sort((a, b) => a.guests - b.guests);
   const hasAmenities = !!room && (roomAmenities(room.amenityKeys).length > 0 || (room.amenities?.length ?? 0) > 0);
 
   return (
@@ -113,14 +115,18 @@ function RoomDetailContent() {
                     <p className="font-serif text-2xl text-foreground">{t?.rooms?.byDates}</p>
                   )}
                   {/* Tarifs selon le nombre de personnes (ex. chambre Patio) */}
-                  {occ.length > 0 && (
+                  {occRows.length > 0 && (
                     <div className="mt-4">
                       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t?.rooms?.ratesByGuests}</p>
                       <ul className="divide-y divide-border rounded-xl border border-border">
-                        {occ.map((p) => (
+                        {occRows.map((p) => (
                           <li key={p.guests} className="flex items-center justify-between px-4 py-2.5 text-sm">
                             <span className="text-foreground">{t?.rooms?.guestsCount(p.guests)}</span>
-                            <span className="font-semibold text-accent">{formatMad(p.price, lang)} {t?.common?.mad}<span className="font-normal text-muted-foreground"> {t?.rooms?.perNight}</span></span>
+                            {Number(p.price) > 0 ? (
+                              <span className="font-semibold text-accent">{formatMad(Number(p.price), lang)} {t?.common?.mad}<span className="font-normal text-muted-foreground"> {t?.rooms?.perNight}</span></span>
+                            ) : (
+                              <span className="text-muted-foreground">{lang === 'en' ? 'On request' : 'Sur demande'}</span>
+                            )}
                           </li>
                         ))}
                       </ul>
