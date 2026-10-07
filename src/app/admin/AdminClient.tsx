@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Room, ContactInfo } from '@/lib/data';
 import GuideAdmin from './GuideAdmin';
 import HomeAdmin from './HomeAdmin';
+import NumInput from './NumInput';
 import type { HomeContent } from '@/lib/home';
 import RiadAdmin from './RiadAdmin';
 import { AMENITIES } from '@/lib/amenities';
@@ -207,14 +208,13 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div><label className={labelCls}>{(r.occupancyPrices?.length ?? 0) > 0 ? 'Prix / nuit (non utilisé : tarifs par personnes)' : 'Prix / nuit, 1 ou 2 pers. (MAD, 0 = non affiché)'}</label>
-                <input type="number" min={0} disabled={(r.occupancyPrices?.length ?? 0) > 0} className={`${inputCls} disabled:opacity-50`} value={r.pricePerNight} onChange={(e) => update(i, { pricePerNight: Number(e.target.value) })} /></div>
+                <NumInput disabled={(r.occupancyPrices?.length ?? 0) > 0} className={`${inputCls} disabled:opacity-50`} value={r.pricePerNight} onChange={(n) => update(i, { pricePerNight: n })} /></div>
               <div><label className={labelCls}>Capacité (personnes)</label>
-                <input type="number" min={1} className={inputCls} value={r.capacity} onChange={(e) => {
-                  const capacity = Number(e.target.value);
+                <NumInput min={1} className={inputCls} value={r.capacity} onChange={(capacity) => {
                   update(i, (r.occupancyPrices?.length ?? 0) > 0 ? { capacity, occupancyPrices: occupancyRows(capacity, r.occupancyPrices) } : { capacity });
                 }} /></div>
               <div><label className={labelCls}>Surface (m², 0 = non affichée)</label>
-                <input type="number" min={0} className={inputCls} value={r.size} onChange={(e) => update(i, { size: Number(e.target.value) })} /></div>
+                <NumInput className={inputCls} value={r.size} onChange={(n) => update(i, { size: n })} /></div>
             </div>
             {/* Tarifs selon le nombre de personnes (chambre Patio : 2, 3 et 4 personnes) */}
             <div className="mb-4 rounded-xl border border-foreground/15 p-4">
@@ -228,8 +228,8 @@ function RoomsEditor({ initial, onSave }: { initial: Room[]; onSave: (v: Room[])
                   {r.occupancyPrices!.map((p, k) => (
                     <div key={p.guests}>
                       <label className={labelCls}>{p.guests} personnes (MAD / nuit)</label>
-                      <input type="number" min={0} className={inputCls} value={p.price}
-                        onChange={(e) => update(i, { occupancyPrices: r.occupancyPrices!.map((x, j) => (j === k ? { ...x, price: Number(e.target.value) } : x)) })} />
+                      <NumInput className={inputCls} value={p.price}
+                        onChange={(n) => update(i, { occupancyPrices: r.occupancyPrices!.map((x, j) => (j === k ? { ...x, price: n } : x)) })} />
                     </div>
                   ))}
                 </div>
