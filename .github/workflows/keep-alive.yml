@@ -1,0 +1,18 @@
+name: keep-supabase-alive
+
+on:
+  schedule:
+    - cron: '0 9 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (site_content)
+        run: |
+          curl -sf "https://pknkuxhjmhmcewnzvfjy.supabase.co/rest/v1/site_content?select=key&limit=1" \
+            -H "apikey: sb_publishable_ojKjFM8-MioPVpK5X3EJkg_A2rOZb5c"
