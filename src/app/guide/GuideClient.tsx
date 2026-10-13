@@ -217,7 +217,7 @@ export default function GuideClient() {
           <div role="group" aria-label="Langue / Language" className="flex items-center rounded-full border border-border p-0.5">
             {(['fr', 'en'] as const).map((l) => (
               <button key={l} type="button" onClick={() => setLang(l)} aria-pressed={lang === l}
-                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider transition-colors ${lang === l ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}`}>
+                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider transition-colors ${lang === l ? 'bg-accent text-white' : 'text-muted-foreground'}`}>
                 {l.toUpperCase()}
               </button>
             ))}
