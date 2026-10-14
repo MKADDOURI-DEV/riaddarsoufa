@@ -24,7 +24,7 @@ function LangSwitch({ light }: { light: boolean }) {
           aria-pressed={lang === l}
           className={`rounded-full px-2.5 py-1 text-xs font-bold tracking-wider transition-colors duration-200 ${
             lang === l
-              ? 'bg-accent text-white'
+              ? 'bg-accent text-accent-foreground'
               : light ? 'text-white/85 hover:text-white' : 'text-muted-foreground hover:text-foreground'
           }`}
         >
