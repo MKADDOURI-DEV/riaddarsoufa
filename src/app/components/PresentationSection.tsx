@@ -13,7 +13,7 @@ export default function PresentationSection() {
   const photo = riad.intro.image || 'https://img.rocket.new/generatedImages/rocket_gen_img_1f01e49fd-1772210725810.png';
 
   return (
-    <section dir={dir} className="section-padding px-4 sm:px-6 lg:px-8 bg-background">
+    <section dir={dir} className="section-padding px-4 sm:px-6 lg:px-8 bg-secondary/30">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Image side */}
