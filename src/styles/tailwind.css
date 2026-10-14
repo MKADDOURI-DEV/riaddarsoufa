@@ -4,23 +4,23 @@
 
 :root {
   /* Palette bleue (photo du client, octobre 2026) : #C3CADD #A5B2C3 #587AA3 #4A5D7C */
-  --background: #c4ceee;
-  --foreground: #1D2738;
-  --primary: #4A5D7C;
-  --primary-foreground: #FFFFFF;
-  --secondary: #E3E8F1;
-  --secondary-foreground: #1D2738;
-  --accent: #587AA3;
-  --accent-foreground: #FFFFFF;
-  --muted: #E6EAF2;
-  --muted-foreground: #556077;
-  --card: #E9EEF7;
-  --card-foreground: #1D2738;
-  --border: #C3CADD;
-  --input: #C3CADD;
-  --ring: #587AA3;
-  --footer: #4A5D7C;
-  --frame: #587AA3;
+  --background: #4a5d7c;
+  --foreground: #E6EAF3;
+  --primary: #FFFFFF;
+  --primary-foreground: #1D2738;
+  --secondary: #3F4F69;
+  --secondary-foreground: #E6EAF3;
+  --accent: #C9D4EE;
+  --accent-foreground: #1D2738;
+  --muted: #56698A;
+  --muted-foreground: #D2D9E8;
+  --card: #3C4C67;
+  --card-foreground: #E6EAF3;
+  --border: #6A7FA0;
+  --input: #6A7FA0;
+  --ring: #C9D4EE;
+  --footer: #2F3C54;
+  --frame: #C9D4EE;
   --radius: 0.5rem;
   --font-sans: var(--font-montserrat), 'Montserrat', Arial, sans-serif;
   --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
